@@ -33,7 +33,8 @@ func home(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "{	\"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\"}")
     case "POST":
 
-      fmt.Println(string(body))
+			log.Printf(string(body))
+      
     
       var obj map[string]interface{}
       json.Unmarshal([]byte(body), &obj)
@@ -61,8 +62,9 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 
   switch r.Method {
     
-    case "POST":
-      fmt.Println("_bulk:")
+		case "POST":
+			//log.Printf("POST _bulk:")
+      
       var splits = strings.Split(string(body), "\n")
       
       for i := 0; i < len(splits); i++ {
@@ -73,12 +75,10 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 				json.Unmarshal([]byte(splits[i]), &obj)
 				channel <- obj
 
-
-
-        f := colorjson.NewFormatter()
-        f.Indent = 4
-        s, _ := f.Marshal(obj)
-        fmt.Println(string(s))
+        //f := colorjson.NewFormatter()
+        //f.Indent = 4
+        //s, _ := f.Marshal(obj)
+        //log.Printf(string(s))
       }
 
       fmt.Fprintf(w, "{\"errors\": false}")
