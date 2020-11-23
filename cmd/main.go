@@ -42,7 +42,7 @@ func read_events(){
 func refresh() {
 	for {
 		app.Draw()
-		time.Sleep(300 * time.Microsecond) 
+		time.Sleep(200 * time.Microsecond) 
 	}
 }
 
@@ -52,20 +52,15 @@ func main() {
 	go read_events()
 	go refresh()
 
-	
-	/*newPrimitive := func(text string) tview.Primitive {
-		return tview.NewTextView().
-			SetTextAlign(tview.AlignCenter).
-			SetText(text)
-	}*/
 
 	menu.
-	AddItem("List item 1", "", 0, nil)
+	AddItem("0 List item 1", "", 0, nil).
+	AddItem("1 List item 2", "", 0, nil)
 
-	/*for i := 1; i <= 100; i++ {
+	for i := 1; i <= 100; i++ {
 		
 		menu.AddItem(fmt.Sprintf("List item %d", i), "", 0, nil)
-	}*/
+	}
 
 	menu.ShowSecondaryText(false)
 
@@ -90,17 +85,30 @@ func main() {
 	s, _ := f.Marshal(obj)
 
 	fmt.Fprintf(main, "%s", tview.TranslateANSI(string(s)))
-		
+
 	menu.SetBorder(true)
 	main.SetBorder(true)
 
-	flex := tview.NewFlex().
+	title :=  tview.NewTextView().
+	SetDynamicColors(true).
+	SetText(" Logshark ")
+
+	footer :=  tview.NewTextView().
+	SetDynamicColors(true).
+	SetText(" [blue]R[white]efresh [blue]S[white]ettings ").
+	SetChangedFunc(func() {
+		app.Draw()
+	})
+
+	layout := tview.NewFlex().
 	AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+		AddItem(title, 1, 1, false).
 		AddItem(menu, 0, 1, false).
 		AddItem(main, 0, 3, false).
-		AddItem(tview.NewBox().SetTitle("Refresh"), 2, 1, false), 0, 2, false)
+		AddItem(footer, 1, 1, false), 0, 2, false)
 
-	if err := app.SetRoot(flex, true).SetFocus(menu).EnableMouse(true).Run(); err != nil {
+
+	if err := app.SetRoot(layout, true).SetFocus(menu).EnableMouse(true).Run(); err != nil {
 		panic(err)
 	}
 
