@@ -10,11 +10,13 @@ import (
   "github.com/TylerBrock/colorjson"
 )
 
-var menu = tview.NewList()
+var eventList = tview.NewList()
 var c = make(chan map[string]interface{})
 var app = tview.NewApplication()
+var eventView = tview.NewTextView()
+
 func read_events(){
-  //log.Printf("epa")
+
   f := colorjson.NewFormatter()
   f.Indent = 4
     
@@ -27,7 +29,7 @@ func read_events(){
 
     s, _ := json.Marshal(obj)
     
-    menu.AddItem(string(s), "", 0, nil)
+    eventList.AddItem(string(s), "", 0, nil)
     
     
     //if err != nil {
@@ -53,24 +55,24 @@ func main() {
   go refresh()
 
 
-  menu.
+  eventList.
   AddItem("0 List item 1", "", 0, nil).
   AddItem("1 List item 2", "", 0, nil)
 
   for i := 1; i <= 100; i++ {
     
-    menu.AddItem(fmt.Sprintf("List item %d", i), "", 0, nil)
+    eventList.AddItem(fmt.Sprintf("List item %d", i), "", 0, nil)
   }
 
-  menu.ShowSecondaryText(false)
+  eventList.ShowSecondaryText(false)
 
-  main := tview.NewTextView().
-    SetDynamicColors(true).
-    SetRegions(true).
-    SetWordWrap(true).
-    SetChangedFunc(func() {
-      app.Draw()
-    })
+  eventView.
+  SetDynamicColors(true).
+  SetRegions(true).
+  SetWordWrap(true).
+  SetChangedFunc(func() {
+    app.Draw()
+  })
 
     
 
@@ -84,10 +86,10 @@ func main() {
   // Marshall the Colorized JSON
   s, _ := f.Marshal(obj)
 
-  fmt.Fprintf(main, "%s", tview.TranslateANSI(string(s)))
+  fmt.Fprintf(eventView, "%s", tview.TranslateANSI(string(s)))
 
-  menu.SetBorder(true)
-  main.SetBorder(true)
+  eventList.SetBorder(true)
+  eventView.SetBorder(true)
 
   title :=  tview.NewTextView().
   SetDynamicColors(true).
@@ -103,12 +105,12 @@ func main() {
   layout := tview.NewFlex().
   AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
     AddItem(title, 1, 1, false).
-    AddItem(menu, 0, 1, false).
-    AddItem(main, 0, 3, false).
+    AddItem(eventList, 0, 1, false).
+    AddItem(eventView, 0, 3, false).
     AddItem(footer, 1, 1, false), 0, 2, false)
 
 
-  if err := app.SetRoot(layout, true).SetFocus(menu).EnableMouse(true).Run(); err != nil {
+  if err := app.SetRoot(layout, true).SetFocus(eventList).EnableMouse(true).Run(); err != nil {
     panic(err)
   }
 
