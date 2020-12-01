@@ -35,13 +35,10 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 			log.Printf(string(body))
       
-    
       var obj map[string]interface{}
       json.Unmarshal([]byte(body), &obj)
       f := colorjson.NewFormatter()
       f.Indent = 4
-      //s, _ := f.Marshal(obj)
-      //fmt.Println(string(s))
     
     default:
         fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
@@ -63,8 +60,7 @@ func bulk(w http.ResponseWriter, r *http.Request) {
   switch r.Method {
     
 		case "POST":
-			//log.Printf("POST _bulk:")
-      
+
       var splits = strings.Split(string(body), "\n")
       
       for i := 0; i < len(splits); i++ {
@@ -75,10 +71,6 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 				json.Unmarshal([]byte(splits[i]), &obj)
 				channel <- obj
 
-        //f := colorjson.NewFormatter()
-        //f.Indent = 4
-        //s, _ := f.Marshal(obj)
-        //log.Printf(string(s))
       }
 
       fmt.Fprintf(w, "{\"errors\": false}")
@@ -87,19 +79,6 @@ func bulk(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "Sorry, only POST method is supported.")
     }
     
-
-
-  /*
-  var prettyJSON bytes.Buffer
-  error := json.Indent(&prettyJSON, body, "", "  ")
-  if error != nil {
-      log.Println("JSON parse error: ", error)
-      return
-  }
-
-  log.Println("\n", string(prettyJSON.Bytes()))
-*/
-
 }
 
 

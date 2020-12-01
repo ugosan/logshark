@@ -21,25 +21,15 @@ var events []interface{}
 
 func read_events(){
 
-
   for {
 		obj := <-channel
 		
 		events = append(events,obj)
-    
-    //s, _ := f.Marshal(obj)
-    //fmt.Println(string(s))
-    //j, err := json.MarshalIndent(obj, "", "")
 
     s, _ := json.Marshal(obj)
 		
-
     eventList.AddItem(fmt.Sprintf("%d    %s", len(events), string(s)), "", 0, nil)
-    
-    
-    //if err != nil {
-    //	log.Printf("epa")
-    //}
+
   }
 
 
@@ -64,7 +54,6 @@ func navigation(event *tcell.EventKey) *tcell.EventKey {
 			app.SetFocus(eventList)
 		}
 
-		
 		return nil
 	}
 
