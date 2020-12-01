@@ -1,8 +1,8 @@
-// Demo code for the List primitive.
 package main
 
 import (
-  "github.com/ugosan/logshark/cmd/server"
+	"github.com/ugosan/logshark/cmd/server"
+	"github.com/gdamore/tcell/v2"
   "github.com/rivo/tview"
   "time"
   "fmt"
@@ -10,26 +10,31 @@ import (
   "github.com/TylerBrock/colorjson"
 )
 
-var eventList = tview.NewList()
-var c = make(chan map[string]interface{})
 var app = tview.NewApplication()
+var eventList = tview.NewList()
+var stats =  tview.NewTextView()
 var eventView = tview.NewTextView()
+var channel = make(chan map[string]interface{})
+var formatter = colorjson.NewFormatter()
+
+var events []interface{}
 
 func read_events(){
 
-  f := colorjson.NewFormatter()
-  f.Indent = 4
-    
+
   for {
-    obj := <-c
+		obj := <-channel
+		
+		events = append(events,obj)
     
     //s, _ := f.Marshal(obj)
     //fmt.Println(string(s))
     //j, err := json.MarshalIndent(obj, "", "")
 
     s, _ := json.Marshal(obj)
-    
-    eventList.AddItem(string(s), "", 0, nil)
+		
+
+    eventList.AddItem(fmt.Sprintf("%d    %s", len(events), string(s)), "", 0, nil)
     
     
     //if err != nil {
@@ -43,69 +48,112 @@ func read_events(){
 //instead of redrawing at every event, redraws every 300 microseconds
 func refresh() {
   for {
+
+		stats.SetText(fmt.Sprintf("%d/1000 | 0 e/s ", len(events)))
     app.Draw()
     time.Sleep(200 * time.Microsecond) 
   }
 }
 
+func navigation(event *tcell.EventKey) *tcell.EventKey {
+	if event.Key() == tcell.KeyTab{
+
+		if(eventList.HasFocus()){
+			app.SetFocus(eventView)
+		}else{
+			app.SetFocus(eventList)
+		}
+
+		
+		return nil
+	}
+
+	if event.Rune() == 't' {
+		
+		var obj map[string]interface{}
+		
+		json.Unmarshal([]byte("{ \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}}"), &obj)
+
+		channel <- obj
+	}
+
+	if event.Rune() == 'r' {
+		eventView.Clear()
+		eventList.Clear()
+	}
+
+	if event.Rune() == 'q' {
+		app.Stop()
+	}
+	return event
+}
+
+func Center(width, height int, p tview.Primitive) tview.Primitive {
+	return tview.NewFlex().
+		AddItem(nil, 0, 1, false).
+		AddItem(tview.NewFlex().
+			SetDirection(tview.FlexRow).
+			AddItem(nil, 0, 1, false).
+			AddItem(p, height, 1, true).
+			AddItem(nil, 0, 1, false), width, 1, true).
+		AddItem(nil, 0, 1, false)
+}
+
 func main() {
 
-  go server.Start(c)
+  go server.Start(channel)
   go read_events()
   go refresh()
 
 
-  eventList.
-  AddItem("0 List item 1", "", 0, nil).
-  AddItem("1 List item 2", "", 0, nil)
+	
 
-  for i := 1; i <= 100; i++ {
-    
-    eventList.AddItem(fmt.Sprintf("List item %d", i), "", 0, nil)
-  }
+  formatter.Indent = 4
 
-  eventList.ShowSecondaryText(false)
+	eventList.ShowSecondaryText(false)
+	eventList.SetChangedFunc(func(line int, t string, t2 string, r rune) {
+		eventView.Clear()
+
+		s, _ := formatter.Marshal(events[line])
+		fmt.Fprintf(eventView, "%s", tview.TranslateANSI(string(s)))
+	})
+
+	stats.
+  SetDynamicColors(true).
+  SetText(" 0/1000 | 0 e/s ")
 
   eventView.
-  SetDynamicColors(true).
-  SetRegions(true).
-  SetWordWrap(true).
-  SetChangedFunc(func() {
-    app.Draw()
-  })
+    SetDynamicColors(true).
+    SetRegions(true).
+		SetWordWrap(true).
+		SetBackgroundColor(tcell.ColorBlack)
+		
 
-    
-
-  var obj map[string]interface{}
-  json.Unmarshal([]byte("{ \"hola\": \"hola\"}"), &obj)
-
-  // Make a custom formatter with indent set
-  f := colorjson.NewFormatter()
-  f.Indent = 4
-
-  // Marshall the Colorized JSON
-  s, _ := f.Marshal(obj)
-
-  fmt.Fprintf(eventView, "%s", tview.TranslateANSI(string(s)))
 
   eventList.SetBorder(true)
-  eventView.SetBorder(true)
+	eventView.SetBorder(true)
+	
+	//app.SetInputCapture(navigation)
+	eventView.SetInputCapture(navigation)
+	eventList.SetInputCapture(navigation)
+
 
   title :=  tview.NewTextView().
   SetDynamicColors(true).
-  SetText(" Logshark ")
+	SetText(" Logshark [gray]v0.1[white] ")
+	
 
   footer :=  tview.NewTextView().
   SetDynamicColors(true).
-  SetText(" [blue]R[white]efresh [blue]S[white]ettings ").
-  SetChangedFunc(func() {
-    app.Draw()
-  })
+  SetText(" [blue]r[white]efresh | [blue]s[white]ettings | [blue]q[white]uit")
+	
+
 
   layout := tview.NewFlex().
   AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
     AddItem(title, 1, 1, false).
-    AddItem(eventList, 0, 1, false).
+		AddItem(eventList, 0, 1, false).
+		AddItem(Center(15,1,stats), 1, 1, false).
     AddItem(eventView, 0, 3, false).
     AddItem(footer, 1, 1, false), 0, 2, false)
 
