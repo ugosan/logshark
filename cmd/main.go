@@ -72,7 +72,9 @@ func navigation(event *tcell.EventKey) *tcell.EventKey {
 		
 		var obj map[string]interface{}
 		
-		json.Unmarshal([]byte("{ \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}}"), &obj)
+		var testJson = fmt.Sprintf("{ \"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}}", len(events)+1)
+
+		json.Unmarshal([]byte(testJson), &obj)
 
 		channel <- obj
 	}
@@ -104,9 +106,6 @@ func main() {
   go server.Start(channel)
   go read_events()
   go refresh()
-
-
-	
 
   formatter.Indent = 4
 
