@@ -33,7 +33,7 @@ func home(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "{	\"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\"}")
     case "POST":
 
-			log.Printf(string(body))
+      log.Printf(string(body))
       
       var obj map[string]interface{}
       json.Unmarshal([]byte(body), &obj)
@@ -59,7 +59,7 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 
   switch r.Method {
     
-		case "POST":
+    case "POST":
 
       var splits = strings.Split(string(body), "\n")
       
@@ -68,13 +68,13 @@ func bulk(w http.ResponseWriter, r *http.Request) {
             continue
         }
         var obj map[string]interface{}
-				json.Unmarshal([]byte(splits[i]), &obj)
-				channel <- obj
+        json.Unmarshal([]byte(splits[i]), &obj)
+        channel <- obj
 
       }
 
       fmt.Fprintf(w, "{\"errors\": false}")
-			
+      
     default:
       fmt.Fprintf(w, "Sorry, only POST method is supported.")
     }
@@ -88,9 +88,9 @@ func Start(c chan map[string]interface{}) {
   log.Print("Listening "+Host+":"+Port)
   
   http.HandleFunc("/", home)
-	http.HandleFunc("/_bulk", bulk)
-	
-	channel = c
+  http.HandleFunc("/_bulk", bulk)
+  
+  channel = c
 
   err := http.ListenAndServe(Host+":"+Port, nil)
   if err != nil {
