@@ -7,16 +7,35 @@ import (
   "io/ioutil"
   "net/http"
   "encoding/json"
-  "github.com/TylerBrock/colorjson"
   "strings"
+  "bytes"
 )
 
 const (
   Host = "0.0.0.0"
   Port = "8080"
+  MaxEvents = 1000
 )
 
+type Stats struct {
+  Events int
+  Eps int
+}
+
+
+var currentStats = Stats{0, 0}
 var channel = make(chan map[string]interface{})
+
+var obj map[string]interface{}
+
+func addEvent(jsonBody string){
+
+  json.Unmarshal([]byte(jsonBody), &obj)
+  channel <- obj
+
+  currentStats.Events += 1
+}
+
 
 func home(w http.ResponseWriter, r *http.Request) {
   
@@ -33,12 +52,7 @@ func home(w http.ResponseWriter, r *http.Request) {
       fmt.Fprintf(w, "{	\"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\"}")
     case "POST":
 
-      log.Printf(string(body))
-      
-      var obj map[string]interface{}
-      json.Unmarshal([]byte(body), &obj)
-      f := colorjson.NewFormatter()
-      f.Indent = 4
+      addEvent(string(body))
     
     default:
         fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
@@ -67,9 +81,12 @@ func bulk(w http.ResponseWriter, r *http.Request) {
         if i%2 == 0 { 
             continue
         }
-        var obj map[string]interface{}
-        json.Unmarshal([]byte(splits[i]), &obj)
-        channel <- obj
+
+        if(currentStats.Events < MaxEvents){
+          addEvent(splits[i])
+        }else{
+          currentStats.Events += 1
+        }
 
       }
 
@@ -81,7 +98,30 @@ func bulk(w http.ResponseWriter, r *http.Request) {
     
 }
 
+func SendTestRequest(){
 
+  var testJson = fmt.Sprintf("{ \"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}}", currentStats.Events)
+
+  resp, err := http.Post(
+    fmt.Sprintf("http://%s:%s", Host,Port),
+    "application/json", 
+    bytes.NewBuffer([]byte(testJson)))
+  if err != nil {
+    print(err)
+  }
+  
+  defer resp.Body.Close()
+    
+}
+
+func GetStats() Stats {
+  return currentStats
+}
+
+func ResetStats() Stats {
+  currentStats = Stats{0, 0}
+  return currentStats
+}
 
 
 func Start(c chan map[string]interface{}) {

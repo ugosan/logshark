@@ -15,9 +15,13 @@ var eventList = tview.NewList()
 var stats =  tview.NewTextView()
 var eventView = tview.NewTextView()
 var channel = make(chan map[string]interface{})
+
+
 var formatter = colorjson.NewFormatter()
 
 var events []interface{}
+
+var redrawFlag = true
 
 func read_events(){
 
@@ -29,9 +33,8 @@ func read_events(){
     s, _ := json.Marshal(obj)
     
     eventList.AddItem(fmt.Sprintf("%d    %s", len(events), string(s)), "", 0, nil)
-
+    redrawFlag = true
   }
-
 
 }
 
@@ -39,9 +42,13 @@ func read_events(){
 func refresh() {
   for {
 
-    stats.SetText(fmt.Sprintf("%d/1000 | 0 e/s ", len(events)))
-    app.Draw()
-    time.Sleep(200 * time.Microsecond) 
+    if(redrawFlag){
+      stats.SetText(fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events))
+      app.Draw()
+      redrawFlag = false
+    }
+
+    time.Sleep(300 * time.Microsecond) 
   }
 }
 
@@ -59,18 +66,13 @@ func navigation(event *tcell.EventKey) *tcell.EventKey {
 
   if event.Rune() == 't' {
     
-    var obj map[string]interface{}
-    
-    var testJson = fmt.Sprintf("{ \"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}}", len(events)+1)
-
-    json.Unmarshal([]byte(testJson), &obj)
-
-    channel <- obj
+    server.SendTestRequest()
   }
 
   if event.Rune() == 'r' {
     eventView.Clear()
     eventList.Clear()
+    server.ResetStats()
   }
 
   if event.Rune() == 'q' {
@@ -96,6 +98,8 @@ func main() {
   go read_events()
   go refresh()
 
+
+
   formatter.Indent = 4
 
   eventList.ShowSecondaryText(false)
@@ -104,6 +108,7 @@ func main() {
 
     s, _ := formatter.Marshal(events[line])
     fmt.Fprintf(eventView, "%s", tview.TranslateANSI(string(s)))
+    
   })
 
   stats.
@@ -122,6 +127,7 @@ func main() {
   //app.SetInputCapture(navigation)
   eventView.SetInputCapture(navigation)
   eventList.SetInputCapture(navigation)
+
 
 
   title :=  tview.NewTextView().
