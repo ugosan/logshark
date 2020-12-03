@@ -1,159 +1,154 @@
+
 package main
 
 import (
-  "github.com/ugosan/logshark/cmd/server"
-  "github.com/gdamore/tcell/v2"
-  "github.com/rivo/tview"
-  "time"
-  "fmt"
-  "encoding/json"
-  "github.com/TylerBrock/colorjson"
+	"log"
+	"math"
+
+
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
 )
 
-var app = tview.NewApplication()
-var eventList = tview.NewList()
-var stats =  tview.NewTextView()
-var eventView = tview.NewTextView()
-var channel = make(chan map[string]interface{})
-
-
-var formatter = colorjson.NewFormatter()
-
-var events []interface{}
-
-var redrawFlag = true
-
-func read_events(){
-
-  for {
-    obj := <-channel
-    
-    events = append(events,obj)
-
-    s, _ := json.Marshal(obj)
-    
-    eventList.AddItem(fmt.Sprintf("%d    %s", len(events), string(s)), "", 0, nil)
-    redrawFlag = true
-  }
-
-}
-
-//instead of redrawing at every event, redraws every 300 microseconds
-func refresh() {
-  for {
-
-    if(redrawFlag){
-      stats.SetText(fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events))
-      app.Draw()
-      redrawFlag = false
-    }
-
-    time.Sleep(300 * time.Microsecond) 
-  }
-}
-
-func navigation(event *tcell.EventKey) *tcell.EventKey {
-  if event.Key() == tcell.KeyTab{
-
-    if(eventList.HasFocus()){
-      app.SetFocus(eventView)
-    }else{
-      app.SetFocus(eventList)
-    }
-
-    return nil
-  }
-
-  if event.Rune() == 't' {
-    
-    server.SendTestRequest()
-  }
-
-  if event.Rune() == 'r' {
-    eventView.Clear()
-    eventList.Clear()
-    server.ResetStats()
-  }
-
-  if event.Rune() == 'q' {
-    app.Stop()
-  }
-  return event
-}
-
-func Center(width, height int, p tview.Primitive) tview.Primitive {
-  return tview.NewFlex().
-    AddItem(nil, 0, 1, false).
-    AddItem(tview.NewFlex().
-      SetDirection(tview.FlexRow).
-      AddItem(nil, 0, 1, false).
-      AddItem(p, height, 1, true).
-      AddItem(nil, 0, 1, false), width, 1, true).
-    AddItem(nil, 0, 1, false)
-}
-
 func main() {
+	if err := ui.Init(); err != nil {
+		log.Fatalf("failed to initialize termui: %v", err)
+	}
+	defer ui.Close()
 
-  go server.Start(channel)
-  go read_events()
-  go refresh()
+	sinFloat64 := (func() []float64 {
+		n := 400
+		data := make([]float64, n)
+		for i := range data {
+			data[i] = 1 + math.Sin(float64(i)/5)
+		}
+		return data
+	})()
+
+	sl := widgets.NewSparkline()
+	sl.Data = sinFloat64[:100]
+	sl.LineColor = ui.ColorCyan
+	sl.TitleStyle.Fg = ui.ColorWhite
+
+	slg := widgets.NewSparklineGroup(sl)
+	slg.Title = "Sparkline"
+
+	lc := widgets.NewPlot()
+	lc.Title = "braille-mode Line Chart"
+	lc.Data = append(lc.Data, sinFloat64)
+	lc.AxesColor = ui.ColorWhite
+	lc.LineColors[0] = ui.ColorYellow
+
+	gs := make([]*widgets.Gauge, 3)
+	for i := range gs {
+		gs[i] = widgets.NewGauge()
+		gs[i].Percent = i * 10
+		gs[i].BarColor = ui.ColorRed
+	}
+
+	ls := widgets.NewList()
+	ls.Rows = []string{
+		"[1] Downloading File 1",
+		"",
+		"",
+		"",
+		"[2] Downloading File 2",
+		"",
+		"",
+		"",
+		"[3] Uploading File 3",
+	}
+	ls.Border = false
+
+	p := widgets.NewParagraph()
+	p.Text = "<> This row has 3 columns\n<- Widgets can be stacked up like left side\n<- Stacked widgets are treated as a single widget"
+	p.Title = "Demonstration"
+
+	l := widgets.NewList()
+	l.Title = "List"
+	l.Rows = []string{
+		"[0] github.com/gizak/termui/v3",
+		"[1] [你好，世界](fg:blue)",
+		"[2] [こんにちは世界](fg:red)",
+		"[3] [color](fg:white,bg:green) output",
+		"[4] output.go",
+		"[5] random_out.go",
+		"[6] dashboard.go",
+		"[7] foo",
+		"[8] bar",
+		"[9] baz",
+		"[0] github.com/gizak/termui/v3",
+		"[1] [你好，世界](fg:blue)",
+		"[2] [こんにちは世界](fg:red)",
+		"[3] [color](fg:white,bg:green) output",
+		"[4] output.go",
+		"[5] random_out.go",
+		"[6] dashboard.go",
+		"[7] foo",
+		"[8] bar",
+		"[9] baz",
+		"[0] github.com/gizak/termui/v3",
+		"[1] [你好，世界](fg:blue)",
+		"[2] [こんにちは世界](fg:red)",
+		"[3] [color](fg:white,bg:green) output",
+		"[4] output.go",
+		"[5] random_out.go",
+		"[6] dashboard.go",
+		"[7] foo",
+		"[8] bar",
+		"[9] baz",
+		"[0] github.com/gizak/termui/v3",
+		"[1] [你好，世界](fg:blue)",
+		"[2] [こんにちは世界](fg:red)",
+		"[3] [color](fg:white,bg:green) output",
+		"[4] output.go",
+		"[5] random_out.go",
+		"[6] dashboard.go",
+		"[7] foo",
+		"[8] bar",
+		"[9] baz",
+	}
+	l.TextStyle = ui.NewStyle(ui.ColorYellow)
+	l.WrapText = false
+
+	grid := ui.NewGrid()
+	termWidth, termHeight := ui.TerminalDimensions()
+	grid.SetRect(0, 0, termWidth, termHeight)
+
+	grid.Set(
+		ui.NewRow(0.95,
+			ui.NewCol(0.2, l),
+			ui.NewCol(0.8, lc),
+		),
+
+		ui.NewRow(0.05,
+			ui.NewCol(1, slg),
+		),
+		
+	)
+
+	ui.Render(grid)
 
 
+	uiEvents := ui.PollEvents()
 
-  formatter.Indent = 4
-
-  eventList.ShowSecondaryText(false)
-  eventList.SetChangedFunc(func(line int, t string, t2 string, r rune) {
-    eventView.Clear()
-
-    s, _ := formatter.Marshal(events[line])
-    fmt.Fprintf(eventView, "%s", tview.TranslateANSI(string(s)))
-    
-  })
-
-  stats.
-  SetDynamicColors(true).
-  SetText(" 0/1000 | 0 e/s ")
-
-  eventView.
-    SetDynamicColors(true).
-    SetRegions(true).
-    SetWordWrap(true).
-    SetBackgroundColor(tcell.ColorBlack)
-
-  eventList.SetBorder(true)
-  eventView.SetBorder(true)
-  
-  //app.SetInputCapture(navigation)
-  eventView.SetInputCapture(navigation)
-  eventList.SetInputCapture(navigation)
-
-
-
-  title :=  tview.NewTextView().
-  SetDynamicColors(true).
-  SetText(" Logshark [gray]v0.1[white] ")
-  
-
-  footer :=  tview.NewTextView().
-  SetDynamicColors(true).
-  SetText(" [blue]r[white]efresh | [blue]s[white]ettings | [blue]q[white]uit")
-  
-
-
-  layout := tview.NewFlex().
-  AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-    AddItem(title, 1, 1, false).
-    AddItem(eventList, 0, 1, false).
-    AddItem(Center(15,1,stats), 1, 1, false).
-    AddItem(eventView, 0, 3, false).
-    AddItem(footer, 1, 1, false), 0, 2, false)
-
-
-  if err := app.SetRoot(layout, true).SetFocus(eventList).EnableMouse(true).Run(); err != nil {
-    panic(err)
-  }
-
-
-
+	for {
+		select {
+		case e := <-uiEvents:
+			switch e.ID {
+			case "q", "<C-c>":
+				return
+			case "j", "<Down>":
+				l.ScrollDown()
+				ui.Render(grid)
+			case "k", "<Up>":
+				l.ScrollUp()
+				ui.Render(grid)
+			case "<Resize>":
+				payload := e.Payload.(ui.Resize)
+				grid.SetRect(0, 0, payload.Width, payload.Height)
+				ui.Clear()
+				ui.Render(grid)
+			}}
+	}
 }
