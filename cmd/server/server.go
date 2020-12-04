@@ -1,4 +1,3 @@
-// Golang HTTP Server
 package server
 
 import (
@@ -26,10 +25,8 @@ type Stats struct {
 var currentStats = Stats{0, 0}
 var channel = make(chan map[string]interface{})
 
-var obj map[string]interface{}
-
 func addEvent(jsonBody string){
-
+  var obj map[string]interface{}
   json.Unmarshal([]byte(jsonBody), &obj)
   channel <- obj
 
@@ -38,7 +35,7 @@ func addEvent(jsonBody string){
 
 
 func home(w http.ResponseWriter, r *http.Request) {
-  
+
   body, err := ioutil.ReadAll(r.Body)
 
   if err != nil {
@@ -48,21 +45,21 @@ func home(w http.ResponseWriter, r *http.Request) {
   }
 
   switch r.Method {
-    case "GET":     
+    case "GET":
       fmt.Fprintf(w, "{	\"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\"}")
     case "POST":
 
       addEvent(string(body))
-    
+
     default:
         fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
     }
-  
+
 }
 
 
 func bulk(w http.ResponseWriter, r *http.Request) {
-  
+
   body, err := ioutil.ReadAll(r.Body)
 
   if err != nil {
@@ -72,13 +69,13 @@ func bulk(w http.ResponseWriter, r *http.Request) {
   }
 
   switch r.Method {
-    
+
     case "POST":
 
       var splits = strings.Split(string(body), "\n")
-      
+
       for i := 0; i < len(splits); i++ {
-        if i%2 == 0 { 
+        if i%2 == 0 {
             continue
         }
 
@@ -91,27 +88,31 @@ func bulk(w http.ResponseWriter, r *http.Request) {
       }
 
       fmt.Fprintf(w, "{\"errors\": false}")
-      
+
     default:
       fmt.Fprintf(w, "Sorry, only POST method is supported.")
     }
-    
+
 }
 
 func SendTestRequest(){
 
-  var testJson = fmt.Sprintf("{ \"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}}", currentStats.Events)
+  var testJson = fmt.Sprintf("{	\"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1,\"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}, \"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\"}", currentStats.Events)
+
+
+
+
 
   resp, err := http.Post(
     fmt.Sprintf("http://%s:%s", Host,Port),
-    "application/json", 
+    "application/json",
     bytes.NewBuffer([]byte(testJson)))
   if err != nil {
     print(err)
   }
-  
+
   defer resp.Body.Close()
-    
+
 }
 
 func GetStats() Stats {
@@ -126,10 +127,10 @@ func ResetStats() Stats {
 
 func Start(c chan map[string]interface{}) {
   log.Print("Listening "+Host+":"+Port)
-  
+
   http.HandleFunc("/", home)
   http.HandleFunc("/_bulk", bulk)
-  
+
   channel = c
 
   err := http.ListenAndServe(Host+":"+Port, nil)
@@ -138,4 +139,3 @@ func Start(c chan map[string]interface{}) {
     return
   }
 }
-
