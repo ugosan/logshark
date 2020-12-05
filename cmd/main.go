@@ -8,13 +8,11 @@ import (
   "github.com/gizak/termui/v3/widgets"
   "fmt"
   "encoding/json"
-  "github.com/TylerBrock/colorjson"
 )
 
 var channel = make(chan map[string]interface{})
 var events []interface{}
 
-var formatter = colorjson.NewFormatter()
 var eventList = widgets.NewList()
 var eventView = widgets.NewParagraph()
 
@@ -39,10 +37,13 @@ func reset() {
 
 func updateEventView() {
 
-  formatter.Indent = 2
-  s, _ := formatter.Marshal(events[eventList.SelectedRow])
+  s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
 
+  //stringsRegex, _ := regexp.Compile(`(".*")(: )`)
 
+	//pretty := stringsRegex.ReplaceAllString(string(s), "[$1](fg:yellow): ")
+	
+  
   eventView.Text = string(s)
 
 }
@@ -61,11 +62,18 @@ func main() {
 
 
   eventView.Title = "preview"
+  
 
   footer := widgets.NewParagraph()
   footer.Text = "lalalalala lalalala"
-  footer.Border = false
-
+  footer.Border = true
+	
+	tsl := widgets.NewSparkline()
+	tsl.LineColor = ui.ColorGreen
+	tsl.Data = []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
+	tsls := widgets.NewSparklineGroup(tsl)
+	//tsls.Title = "  "
+	tsls.BorderStyle.Fg = ui.ColorWhite
 
   eventList.Title = "List"
   eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
@@ -82,7 +90,8 @@ func main() {
     ),
 
     ui.NewRow(0.08,
-      ui.NewCol(1, footer),
+			ui.NewCol(0.2, tsls),
+			ui.NewCol(0.8, footer),
     ),
 
   )
