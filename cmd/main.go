@@ -6,16 +6,18 @@ import (
   "log"
   ui "github.com/gizak/termui/v3"
   "github.com/gizak/termui/v3/widgets"
-  "fmt"
+	"fmt"
+	"time"
   "encoding/json"
 )
 
 var channel = make(chan map[string]interface{})
 var events []interface{}
-
+var redrawFlag = true
 var eventList = widgets.NewList()
 var eventView = widgets.NewParagraph()
-
+var footer = widgets.NewParagraph()
+var grid = ui.NewGrid()
 
 func read_events(){
 
@@ -23,9 +25,26 @@ func read_events(){
     obj := <-channel
     events = append(events, obj)
     s, _ := json.Marshal(obj)
-    eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
+		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
+
+		footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
+		ui.Render(grid)
   }
 
+}
+
+//instead of redrawing at every event, redraws every 300 microseconds
+func redraw() {
+  for {
+
+    if(redrawFlag){
+			footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
+      ui.Render(grid)
+      redrawFlag = false
+    }
+
+    time.Sleep(300 * time.Microsecond) 
+  }
 }
 
 func reset() {
@@ -37,23 +56,23 @@ func reset() {
 
 func updateEventView() {
 
-  s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
+	if(eventList.SelectedRow>-1){
+    s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
 
-  //stringsRegex, _ := regexp.Compile(`(".*")(: )`)
+  	//stringsRegex, _ := regexp.Compile(`(".*")(: )`)
 
-	//pretty := stringsRegex.ReplaceAllString(string(s), "[$1](fg:yellow): ")
+		//pretty := stringsRegex.ReplaceAllString(string(s), "[$1](fg:yellow): ")
 	
-  
-  eventView.Text = string(s)
+		eventView.Text = string(s)
+
+		ui.Render(eventList, eventView)
+	}
 
 }
 
 func main() {
 
   go server.Start(channel)
-  go read_events()
-
-
 
   if err := ui.Init(); err != nil {
     log.Fatalf("failed to initialize termui: %v", err)
@@ -62,10 +81,6 @@ func main() {
 
 
   eventView.Title = "preview"
-  
-
-  footer := widgets.NewParagraph()
-  footer.Text = "lalalalala lalalala"
   footer.Border = true
 	
 	tsl := widgets.NewSparkline()
@@ -96,35 +111,42 @@ func main() {
 
   )
 
-  ui.Render(grid)
+	ui.Render(grid)
+	
+	
+	go read_events()
+	go redraw()
 
+	uiEvents := ui.PollEvents()
+	ticker := time.NewTicker(time.Microsecond*300).C
 
-  for {
-    select {
-      case e := <-ui.PollEvents():
-        switch e.ID {
-        case "q", "<C-c>":
-          return
-        case "<Down>":
-          eventList.ScrollDown()
-          updateEventView()
-          ui.Render(grid)
-        case "<Up>":
-          eventList.ScrollUp()
-          updateEventView()
-          ui.Render(grid)
-        case "r":
-          reset()
-          ui.Render(grid)
-        case "t":
-          server.SendTestRequest()
-          ui.Render(grid)
-        case "<Resize>":
-          payload := e.Payload.(ui.Resize)
-          grid.SetRect(0, 0, payload.Width, payload.Height)
-          ui.Clear()
-          ui.Render(grid)
-        }
-    }
-  }
+	for {
+		select {
+		case e := <-uiEvents:
+			switch e.ID {
+			case "q", "<C-c>":
+				return
+			case "<Down>":
+				eventList.ScrollDown()
+				updateEventView()
+			case "<Up>":
+				eventList.ScrollUp()
+				updateEventView()
+			case "r":
+				reset()
+				ui.Render(grid)
+			case "t":
+				server.SendTestRequest()
+				ui.Render(grid)
+			case "<Resize>":
+				payload := e.Payload.(ui.Resize)
+				grid.SetRect(0, 0, payload.Width, payload.Height)
+				ui.Clear()
+				ui.Render(grid)
+			}
+		case <-ticker:
+			ui.Render(eventList, eventView, footer)
+		}
+	}
+
 }
