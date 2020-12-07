@@ -6,11 +6,11 @@ import (
   "log"
   ui "github.com/gizak/termui/v3"
   "github.com/gizak/termui/v3/widgets"
-	"fmt"
-	"time"
+  "fmt"
+  "time"
   "encoding/json"
 )
-
+  
 var channel = make(chan map[string]interface{})
 var events []interface{}
 var redrawFlag = true
@@ -25,10 +25,10 @@ func read_events(){
     obj := <-channel
     events = append(events, obj)
     s, _ := json.Marshal(obj)
-		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
+    eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
-		footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
-		ui.Render(grid)
+    footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
+    ui.Render(grid)
   }
 
 }
@@ -38,7 +38,7 @@ func redraw() {
   for {
 
     if(redrawFlag){
-			footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
+      footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
       ui.Render(grid)
       redrawFlag = false
     }
@@ -56,17 +56,17 @@ func reset() {
 
 func updateEventView() {
 
-	if(eventList.SelectedRow>-1){
+  if(eventList.SelectedRow>-1){
     s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
 
-  	//stringsRegex, _ := regexp.Compile(`(".*")(: )`)
+    //stringsRegex, _ := regexp.Compile(`(".*")(: )`)
 
-		//pretty := stringsRegex.ReplaceAllString(string(s), "[$1](fg:yellow): ")
-	
-		eventView.Text = string(s)
+    //pretty := stringsRegex.ReplaceAllString(string(s), "[$1](fg:yellow): ")
+  
+    eventView.Text = string(s)
 
-		ui.Render(eventList, eventView)
-	}
+    ui.Render(eventList, eventView)
+  }
 
 }
 
@@ -82,13 +82,13 @@ func main() {
 
   eventView.Title = "preview"
   footer.Border = true
-	
-	tsl := widgets.NewSparkline()
-	tsl.LineColor = ui.ColorGreen
-	tsl.Data = []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
-	tsls := widgets.NewSparklineGroup(tsl)
-	//tsls.Title = "  "
-	tsls.BorderStyle.Fg = ui.ColorWhite
+  
+  tsl := widgets.NewSparkline()
+  tsl.LineColor = ui.ColorGreen
+  tsl.Data = []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
+  tsls := widgets.NewSparklineGroup(tsl)
+  //tsls.Title = "  "
+  tsls.BorderStyle.Fg = ui.ColorWhite
 
   eventList.Title = "List"
   eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
@@ -105,48 +105,48 @@ func main() {
     ),
 
     ui.NewRow(0.08,
-			ui.NewCol(0.2, tsls),
-			ui.NewCol(0.8, footer),
+      ui.NewCol(0.2, tsls),
+      ui.NewCol(0.8, footer),
     ),
 
   )
 
-	ui.Render(grid)
-	
-	
-	go read_events()
-	go redraw()
+  ui.Render(grid)
+  
+  
+  go read_events()
+  go redraw()
 
-	uiEvents := ui.PollEvents()
-	ticker := time.NewTicker(time.Microsecond*300).C
+  uiEvents := ui.PollEvents()
+  ticker := time.NewTicker(time.Microsecond*300).C
 
-	for {
-		select {
-		case e := <-uiEvents:
-			switch e.ID {
-			case "q", "<C-c>":
-				return
-			case "<Down>":
-				eventList.ScrollDown()
-				updateEventView()
-			case "<Up>":
-				eventList.ScrollUp()
-				updateEventView()
-			case "r":
-				reset()
-				ui.Render(grid)
-			case "t":
-				server.SendTestRequest()
-				ui.Render(grid)
-			case "<Resize>":
-				payload := e.Payload.(ui.Resize)
-				grid.SetRect(0, 0, payload.Width, payload.Height)
-				ui.Clear()
-				ui.Render(grid)
-			}
-		case <-ticker:
-			ui.Render(eventList, eventView, footer)
-		}
-	}
+  for {
+    select {
+    case e := <-uiEvents:
+      switch e.ID {
+      case "q", "<C-c>":
+        return
+      case "<Down>":
+        eventList.ScrollDown()
+        updateEventView()
+      case "<Up>":
+        eventList.ScrollUp()
+        updateEventView()
+      case "r":
+        reset()
+        ui.Render(grid)
+      case "t":
+        server.SendTestRequest()
+        ui.Render(grid)
+      case "<Resize>":
+        payload := e.Payload.(ui.Resize)
+        grid.SetRect(0, 0, payload.Width, payload.Height)
+        ui.Clear()
+        ui.Render(grid)
+      }
+    case <-ticker:
+      ui.Render(eventList, eventView, footer)
+    }
+  }
 
 }
