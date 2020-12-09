@@ -9,15 +9,21 @@ import (
   "fmt"
   "time"
   "encoding/json"
+  "github.com/hokaccha/go-prettyjson"
 )
   
-var channel = make(chan map[string]interface{})
-var events []interface{}
-var redrawFlag = true
-var eventList = widgets.NewList()
-var eventView = widgets.NewParagraph()
-var footer = widgets.NewParagraph()
-var grid = ui.NewGrid()
+var (
+  channel = make(chan map[string]interface{})
+  events []interface{}
+  redrawFlag = true
+  eventList = widgets.NewList()
+  eventView = widgets.NewParagraph()
+  footer = widgets.NewParagraph()
+  grid = ui.NewGrid()
+
+	f = prettyjson.NewFormatter()
+)
+
 
 func read_events(){
 
@@ -57,12 +63,9 @@ func reset() {
 func updateEventView() {
 
   if(eventList.SelectedRow>-1){
+
     s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
 
-    //stringsRegex, _ := regexp.Compile(`(".*")(: )`)
-
-    //pretty := stringsRegex.ReplaceAllString(string(s), "[$1](fg:yellow): ")
-  
     eventView.Text = string(s)
 
     ui.Render(eventList, eventView)
@@ -146,6 +149,11 @@ func main() {
       }
     case <-ticker:
       ui.Render(eventList, eventView, footer)
+      
+      if(len(eventList.Rows) == 1){
+        eventList.SelectedRow = 0
+        updateEventView()
+      }
     }
   }
 
