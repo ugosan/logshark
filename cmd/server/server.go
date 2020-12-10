@@ -8,6 +8,7 @@ import (
   "encoding/json"
   "strings"
   "bytes"
+  "time"
 )
 
 
@@ -19,11 +20,12 @@ const (
 
 type Stats struct {
   Events int
+  EpsT0 int
   Eps int
 }
 
 
-var currentStats = Stats{0, 0}
+var currentStats = Stats{0, 0, 0}
 var channel = make(chan map[string]interface{})
 
 func addEvent(jsonBody string){
@@ -34,13 +36,25 @@ func addEvent(jsonBody string){
   currentStats.Events += 1
 }
 
+func updateEps() {
+  ticker := time.NewTicker(time.Second).C
+
+  for {
+    select {
+    case <-ticker:
+      currentStats.Eps = currentStats.Events - currentStats.EpsT0
+      currentStats.EpsT0 = currentStats.Events
+    }
+  }
+}
+
 
 func home(w http.ResponseWriter, r *http.Request) {
 
   body, err := ioutil.ReadAll(r.Body)
 
   if err != nil {
-      log.Printf("Error reading body: %v", err)
+    log.Printf("Error reading body: %v", err)
       http.Error(w, "can't read body", http.StatusBadRequest)
       return
   }
@@ -117,7 +131,7 @@ func GetStats() Stats {
 }
 
 func ResetStats() Stats {
-  currentStats = Stats{0, 0}
+  currentStats = Stats{0, 0, 0}
   return currentStats
 }
 
@@ -129,6 +143,8 @@ func Start(c chan map[string]interface{}) {
   http.HandleFunc("/_bulk", bulk)
 
   channel = c
+
+  go updateEps()
 
   err := http.ListenAndServe(Host+":"+Port, nil)
   if err != nil {

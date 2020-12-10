@@ -33,7 +33,7 @@ func read_events(){
     s, _ := json.Marshal(obj)
     eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
-    footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
+    footer.Text = fmt.Sprintf("%d/1000 | %d e/s ", server.GetStats().Events, server.GetStats().Eps)
     ui.Render(grid)
   }
 
@@ -44,7 +44,7 @@ func redraw() {
   for {
 
     if(redrawFlag){
-      footer.Text = fmt.Sprintf("%d/1000 | 0 e/s ", server.GetStats().Events)
+      
       ui.Render(grid)
       redrawFlag = false
     }
@@ -73,6 +73,11 @@ func updateEventView() {
 
 }
 
+func updateStats() {
+  footer.Text = fmt.Sprintf("%d/1000 | %d e/s ", server.GetStats().Events, server.GetStats().Eps)
+}
+
+
 func main() {
 
   go server.Start(channel)
@@ -88,7 +93,7 @@ func main() {
   
   tsl := widgets.NewSparkline()
   tsl.LineColor = ui.ColorGreen
-  tsl.Data = []float64{4, 2, 1, 6, 3, 9, 1, 4, 2, 15, 14, 9, 8, 6, 10, 13, 15, 12, 10, 5, 3, 6, 1, 7, 10, 10, 14, 13, 6}
+  tsl.Data = []float64{2, 2, 1, 2, 3, 2, 1, 2, 2, 2, 2, 2, 2, 3, 1, 4, 5, 2, 2, 5}
   tsls := widgets.NewSparklineGroup(tsl)
   //tsls.Title = "  "
   tsls.BorderStyle.Fg = ui.ColorWhite
@@ -149,7 +154,7 @@ func main() {
       }
     case <-ticker:
       ui.Render(eventList, eventView, footer)
-      
+      updateStats()
       if(len(eventList.Rows) == 1){
         eventList.SelectedRow = 0
         updateEventView()
