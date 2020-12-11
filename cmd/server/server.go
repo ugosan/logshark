@@ -1,6 +1,7 @@
 package server
 
 import (
+  "github.com/ugosan/logshark/cmd/config"
   "fmt"
   "log"
   "io/ioutil"
@@ -12,18 +13,13 @@ import (
 )
 
 
-const (
-  Host = "0.0.0.0"
-  Port = "8080"
-  MaxEvents = 1000
-)
-
 type Stats struct {
   Events int
   EpsT0 int
   Eps int
 }
 
+var configflags config.Config
 
 var currentStats = Stats{0, 0, 0}
 var channel = make(chan map[string]interface{})
@@ -94,7 +90,7 @@ func bulk(w http.ResponseWriter, r *http.Request) {
             continue
         }
 
-        if(currentStats.Events < MaxEvents){
+        if(currentStats.Events < configflags.MaxEvents){
           addEvent(splits[i])
         }else{
           currentStats.Events += 1
@@ -116,7 +112,7 @@ func SendTestRequest(){
 
 
   resp, err := http.Post(
-    fmt.Sprintf("http://%s:%s", Host,Port),
+    fmt.Sprintf("http://%s:%s", configflags.Host, configflags.Port),
     "application/json",
     bytes.NewBuffer([]byte(testJson)))
   if err != nil {
@@ -136,17 +132,23 @@ func ResetStats() Stats {
 }
 
 
-func Start(c chan map[string]interface{}) {
-  log.Print("Listening "+Host+":"+Port)
+func Start(c chan map[string]interface{}, config config.Config) {
+  
+  configflags = config
+
+  
+
+  log.Print("Listening "+config.Host+":"+config.Port)
 
   http.HandleFunc("/", home)
   http.HandleFunc("/_bulk", bulk)
 
+ 
   channel = c
 
   go updateEps()
 
-  err := http.ListenAndServe(Host+":"+Port, nil)
+  err := http.ListenAndServe(config.Host+":"+config.Port, nil)
   if err != nil {
     log.Fatal("Error Starting the HTTP Server : ", err)
     return

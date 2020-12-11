@@ -24,6 +24,8 @@ github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d h1:x3S6kxmy49zXVVyh
 github.com/nsf/termbox-go v0.0.0-20190121233118-02980233997d/go.mod h1:IuKpRQcYE1Tfu+oAQqaLisqDeXgjyyltCfsaoYN18NQ=
 github.com/nsf/termbox-go v0.0.0-20201124104050-ed494de23a00 h1:Rl8NelBe+n7SuLbJyw13ho7CGWUt2BjGGKIoreCWQ/c=
 github.com/nsf/termbox-go v0.0.0-20201124104050-ed494de23a00/go.mod h1:T0cTdVuOwf7pHQNtfhnEbzHbcNyCEcVU4YPpouCbVxo=
+github.com/pwaller/goupx v0.0.0-20160623083017-1d58e01d5ce2 h1:jqseQkFFoC94bolcHt7j90VPTgVetWlQeqFZoXN+Y2U=
+github.com/pwaller/goupx v0.0.0-20160623083017-1d58e01d5ce2/go.mod h1:XO/Ely/VDivCoLQzV3hMz5dN1y6OAXUEPTwYPWQagS0=
 golang.org/x/sys v0.0.0-20190626150813-e07cf5db2756/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae h1:/WDfKMnPU+m5M4xB+6x4kaepxRw6jWvR5iDRdvjHgy8=
