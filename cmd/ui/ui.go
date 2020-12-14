@@ -3,14 +3,15 @@ package ui
 
 import (
 	"github.com/ugosan/logshark/cmd/server"
-	"github.com/ugosan/logshark/cmd/config"
+  "github.com/ugosan/logshark/cmd/config"
+  "github.com/TylerBrock/colorjson"
   "log"
   ui "github.com/gizak/termui/v3"
   "github.com/gizak/termui/v3/widgets"
   "fmt"
   "time"
+  "regexp"
   "encoding/json"
-  "github.com/hokaccha/go-prettyjson"
 )
   
 var (
@@ -22,7 +23,6 @@ var (
   footer = widgets.NewParagraph()
   grid = ui.NewGrid()
 
-	f = prettyjson.NewFormatter()
 )
 
 
@@ -65,9 +65,27 @@ func updateEventView() {
 
   if(eventList.SelectedRow>-1){
 
-    s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
+    f := colorjson.NewFormatter()
+    f.Indent = 2
 
-    eventView.Text = string(s)
+    s, _ := f.Marshal(events[eventList.SelectedRow])
+    //fmt.Println(string(s))
+
+    pretty := string(s)
+    keysRegex, _ := regexp.Compile(`(\[37m)(.*?)(\[0m)`)
+    stringsRegex, _ := regexp.Compile(`(\[32m)(.*?)(\[0m)`)
+    numbersRegex, _ := regexp.Compile(`(\[36m)(.*?)(\[0m)`)
+    booleanRegex, _ := regexp.Compile(`(\[33m)(.*?)(\[0m)`)
+
+
+    pretty = stringsRegex.ReplaceAllString(pretty, "[$2](fg:yellow)")
+    pretty = numbersRegex.ReplaceAllString(pretty, "[$2](fg:magenta)")
+    pretty = keysRegex.ReplaceAllString(pretty, "[$2](fg:blue)")
+    pretty = booleanRegex.ReplaceAllString(pretty, "[$2](fg:green)")
+
+    //s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
+
+    eventView.Text = pretty
 
     ui.Render(eventList, eventView)
   }
@@ -144,6 +162,9 @@ func Start(config config.Config) {
       case "r":
         reset()
         ui.Render(grid)
+      case "u":
+        eventView.Text = "[3] [\"color\"](fg:white,bg:green) output"
+        
       case "t":
         server.SendTestRequest()
         ui.Render(grid)
