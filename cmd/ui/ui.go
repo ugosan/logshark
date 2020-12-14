@@ -4,6 +4,7 @@ package ui
 import (
 	"github.com/ugosan/logshark/cmd/server"
   "github.com/ugosan/logshark/cmd/config"
+  logshark_widgets "github.com/ugosan/logshark/cmd/widgets"
   "github.com/TylerBrock/colorjson"
   "log"
   ui "github.com/gizak/termui/v3"
@@ -19,10 +20,9 @@ var (
   events []interface{}
   redrawFlag = true
   eventList = widgets.NewList()
-  eventView = widgets.NewParagraph()
+  eventView = logshark_widgets.NewParagraph()
   footer = widgets.NewParagraph()
   grid = ui.NewGrid()
-
 )
 
 
@@ -78,10 +78,10 @@ func updateEventView() {
     booleanRegex, _ := regexp.Compile(`(\[33m)(.*?)(\[0m)`)
 
 
-    pretty = stringsRegex.ReplaceAllString(pretty, "[$2](fg:yellow)")
-    pretty = numbersRegex.ReplaceAllString(pretty, "[$2](fg:magenta)")
-    pretty = keysRegex.ReplaceAllString(pretty, "[$2](fg:blue)")
-    pretty = booleanRegex.ReplaceAllString(pretty, "[$2](fg:green)")
+    pretty = stringsRegex.ReplaceAllString(pretty, "<$2>(fg:yellow)")
+    pretty = numbersRegex.ReplaceAllString(pretty, "<$2>(fg:magenta)")
+    pretty = keysRegex.ReplaceAllString(pretty, "<$2>(fg:blue)")
+    pretty = booleanRegex.ReplaceAllString(pretty, "<$2>(fg:green)")
 
     //s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
 
