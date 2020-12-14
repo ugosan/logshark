@@ -23,6 +23,11 @@ var (
   eventView = logshark_widgets.NewParagraph()
   footer = widgets.NewParagraph()
   grid = ui.NewGrid()
+
+  keysRegex, _ = regexp.Compile(`(\[37m)(.*?)(\[0m)`)
+  stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
+  numbersRegex, _ = regexp.Compile(`(\[36m)(.*?)(\[0m)`)
+  booleanRegex, _ = regexp.Compile(`(\[33m)(.*?)(\[0m)`)
 )
 
 
@@ -61,6 +66,16 @@ func reset() {
   server.ResetStats()
 }
 
+func translateANSI(s string) string {
+
+  s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow)")
+  s = numbersRegex.ReplaceAllString(s, "<$2>(fg:magenta)")
+  s = keysRegex.ReplaceAllString(s, "<$2>(fg:blue)")
+  s = booleanRegex.ReplaceAllString(s, "<$2>(fg:green)")
+
+  return s
+}
+
 func updateEventView() {
 
   if(eventList.SelectedRow>-1){
@@ -69,23 +84,8 @@ func updateEventView() {
     f.Indent = 2
 
     s, _ := f.Marshal(events[eventList.SelectedRow])
-    //fmt.Println(string(s))
 
-    pretty := string(s)
-    keysRegex, _ := regexp.Compile(`(\[37m)(.*?)(\[0m)`)
-    stringsRegex, _ := regexp.Compile(`(\[32m)(.*?)(\[0m)`)
-    numbersRegex, _ := regexp.Compile(`(\[36m)(.*?)(\[0m)`)
-    booleanRegex, _ := regexp.Compile(`(\[33m)(.*?)(\[0m)`)
-
-
-    pretty = stringsRegex.ReplaceAllString(pretty, "<$2>(fg:yellow)")
-    pretty = numbersRegex.ReplaceAllString(pretty, "<$2>(fg:magenta)")
-    pretty = keysRegex.ReplaceAllString(pretty, "<$2>(fg:blue)")
-    pretty = booleanRegex.ReplaceAllString(pretty, "<$2>(fg:green)")
-
-    //s, _ := json.MarshalIndent(events[eventList.SelectedRow], "", "  ")
-
-    eventView.Text = pretty
+    eventView.Text = translateANSI(string(s))
 
     ui.Render(eventList, eventView)
   }

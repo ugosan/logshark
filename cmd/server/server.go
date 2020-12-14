@@ -108,7 +108,7 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 
 func SendTestRequest(){
 
-  var testJson = fmt.Sprintf("{	\"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1, \"string\": \"stringsss\", \"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}, \"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\", \"test\": \" weird \\\"aaa\\\": 1 \"}", currentStats.Events)
+  var testJson = fmt.Sprintf("{	\"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1, \"string\": \"stringsss\", \"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}, \"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\", \"test\": \" <>()weird \\\"aaa\\\": 1 \"}", currentStats.Events)
 
   
   resp, err := http.Post(
