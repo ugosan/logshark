@@ -27,6 +27,7 @@ const (
 	parserStateDefault parserState = iota
 	parserStateStyleItems
 	parserStateStyledText
+	ColorDarkRed = 88
 )
 
 // StyleParserColorMap can be modified to add custom color parsing to text
@@ -40,6 +41,7 @@ var StyleParserColorMap = map[string]Color{
 	"clear":   ColorClear,
 	"green":   ColorGreen,
 	"magenta": ColorMagenta,
+	"darkred": ColorDarkRed,
 }
 
 var modifierMap = map[string]Modifier{

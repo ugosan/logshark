@@ -106,16 +106,8 @@ func Start(config config.Config) {
   }
   defer ui.Close()
 
-
   eventView.Title = "preview"
   footer.Border = true
-  
-  tsl := widgets.NewSparkline()
-  tsl.LineColor = ui.ColorGreen
-  tsl.Data = []float64{2, 2, 1, 2, 3, 2, 1, 2, 2, 2, 2, 2, 2, 3, 1, 4, 5, 2, 2, 5}
-  tsls := widgets.NewSparklineGroup(tsl)
-  //tsls.Title = "  "
-  tsls.BorderStyle.Fg = ui.ColorWhite
 
   eventList.Title = "List"
   eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
@@ -123,23 +115,21 @@ func Start(config config.Config) {
 
   grid := ui.NewGrid()
   termWidth, termHeight := ui.TerminalDimensions()
-  grid.SetRect(0, 0, termWidth, termHeight)
+  
+  grid.SetRect(0, 0, termWidth, termHeight-3)
 
   grid.Set(
-    ui.NewRow(0.92,
+    ui.NewRow(1,
       ui.NewCol(0.2, eventList),
       ui.NewCol(0.8, eventView),
     ),
 
-    ui.NewRow(0.08,
-      ui.NewCol(0.2, tsls),
-      ui.NewCol(0.8, footer),
-    ),
 
   )
 
+  footer.SetRect(0, termHeight-3, termWidth, termHeight)
+
   ui.Render(grid)
-  
   
   go read_events()
   go redraw()
@@ -170,7 +160,8 @@ func Start(config config.Config) {
         ui.Render(grid)
       case "<Resize>":
         payload := e.Payload.(ui.Resize)
-        grid.SetRect(0, 0, payload.Width, payload.Height)
+        grid.SetRect(0, 0, payload.Width, payload.Height-3)
+        footer.SetRect(0, payload.Height-3, payload.Width, payload.Height)
         ui.Clear()
         ui.Render(grid)
       }
