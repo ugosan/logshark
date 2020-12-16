@@ -123,8 +123,6 @@ func Start(config config.Config) {
       ui.NewCol(0.2, eventList),
       ui.NewCol(0.8, eventView),
     ),
-
-
   )
 
   footer.SetRect(0, termHeight-3, termWidth, termHeight)
@@ -152,9 +150,6 @@ func Start(config config.Config) {
       case "r":
         reset()
         ui.Render(grid)
-      case "u":
-        eventView.Text = "[3] [\"color\"](fg:white,bg:green) output"
-        
       case "t":
         server.SendTestRequest()
         ui.Render(grid)
