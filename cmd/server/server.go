@@ -25,8 +25,10 @@ var currentStats = Stats{0, 0, 0}
 var channel = make(chan map[string]interface{})
 
 func addEvent(jsonBody string){
+  
   var obj map[string]interface{}
   json.Unmarshal([]byte(jsonBody), &obj)
+
   channel <- obj
 
   currentStats.Events += 1

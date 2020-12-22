@@ -17,29 +17,34 @@ import (
   
 var (
   channel = make(chan map[string]interface{})
-  events []interface{}
+  events []string
   redrawFlag = true
   eventList = widgets.NewList()
   eventView = logshark_widgets.NewParagraph()
-  footer = widgets.NewParagraph()
+  footer = logshark_widgets.NewFooter()
   grid = ui.NewGrid()
 
   keysRegex, _ = regexp.Compile(`(\[37m)(.*?)(\[0m)`)
   stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
   numbersRegex, _ = regexp.Compile(`(\[36m)(.*?)(\[0m)`)
   booleanRegex, _ = regexp.Compile(`(\[33m)(.*?)(\[0m)`)
+  termWidth = 0
+  termHeight = 0
+  formatter = colorjson.NewFormatter()
 )
 
 
-func read_events(){
+func readEvents(){
 
   for {
     obj := <-channel
-    events = append(events, obj)
+
+    prettyJson, _ := formatter.Marshal(obj)
+    events = append(events, translateANSI(string(prettyJson)))
+    
     s, _ := json.Marshal(obj)
     eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
-    footer.Text = fmt.Sprintf("%d/1000 | %d e/s ", server.GetStats().Events, server.GetStats().Eps)
     ui.Render(grid)
   }
 
@@ -80,12 +85,7 @@ func updateEventView() {
 
   if(eventList.SelectedRow>-1){
 
-    f := colorjson.NewFormatter()
-    f.Indent = 2
-
-    s, _ := f.Marshal(events[eventList.SelectedRow])
-
-    eventView.Text = translateANSI(string(s))
+    eventView.Text = events[eventList.SelectedRow]
 
     ui.Render(eventList, eventView)
   }
@@ -93,7 +93,13 @@ func updateEventView() {
 }
 
 func updateStats() {
-  footer.Text = fmt.Sprintf("%d/1000 | %d e/s ", server.GetStats().Events, server.GetStats().Eps)
+  stats := fmt.Sprintf(" %d/1000 | %d e/s", server.GetStats().Events, server.GetStats().Eps)
+  
+  
+  for i := len(stats); i <= termWidth; i++ {
+    stats += "-"
+  }
+  footer.Text = stats
 }
 
 
@@ -106,17 +112,19 @@ func Start(config config.Config) {
   }
   defer ui.Close()
 
+  formatter.Indent = 2
   eventView.Title = "preview"
-  footer.Border = true
+  footer.Border = false
+  footer.TextStyle.Bg = ui.ColorBlue
 
   eventList.Title = "List"
   eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
   eventList.WrapText = false
 
   grid := ui.NewGrid()
-  termWidth, termHeight := ui.TerminalDimensions()
+  termWidth, termHeight = ui.TerminalDimensions()
   
-  grid.SetRect(0, 0, termWidth, termHeight-3)
+  grid.SetRect(0, 0, termWidth, termHeight-1)
 
   grid.Set(
     ui.NewRow(1,
@@ -125,11 +133,11 @@ func Start(config config.Config) {
     ),
   )
 
-  footer.SetRect(0, termHeight-3, termWidth, termHeight)
+  footer.SetRect(0, termHeight-1, termWidth, termHeight)
 
   ui.Render(grid)
   
-  go read_events()
+  go readEvents()
   go redraw()
 
   uiEvents := ui.PollEvents()
@@ -155,8 +163,13 @@ func Start(config config.Config) {
         ui.Render(grid)
       case "<Resize>":
         payload := e.Payload.(ui.Resize)
-        grid.SetRect(0, 0, payload.Width, payload.Height-3)
-        footer.SetRect(0, payload.Height-3, payload.Width, payload.Height)
+
+        termWidth = payload.Width
+        termHeight = payload.Height
+
+
+        grid.SetRect(0, 0, termWidth, termHeight-1)
+        footer.SetRect(0, payload.Height-1, payload.Width, payload.Height)
         ui.Clear()
         ui.Render(grid)
       }
