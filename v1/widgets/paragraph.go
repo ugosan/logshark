@@ -8,7 +8,7 @@ import (
 	"image"
 
 	. "github.com/gizak/termui/v3"
-	parser "github.com/ugosan/logshark/cmd/parser"
+	parser "github.com/ugosan/logshark/v1/parser"
 )
 
 type Paragraph struct {

@@ -2,9 +2,9 @@ package ui
 
 
 import (
-	"github.com/ugosan/logshark/cmd/server"
-  "github.com/ugosan/logshark/cmd/config"
-  logshark_widgets "github.com/ugosan/logshark/cmd/widgets"
+	"github.com/ugosan/logshark/v1/server"
+  "github.com/ugosan/logshark/v1/config"
+  logshark_widgets "github.com/ugosan/logshark/v1/widgets"
   "github.com/TylerBrock/colorjson"
   "log"
   ui "github.com/gizak/termui/v3"
@@ -93,8 +93,7 @@ func updateEventView() {
 }
 
 func updateStats() {
-  stats := fmt.Sprintf(" %d/1000 | %d e/s", server.GetStats().Events, server.GetStats().Eps)
-  
+  stats := fmt.Sprintf(" %d/%d | %d e/s", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
   
   for i := len(stats); i <= termWidth; i++ {
     stats += "-"

@@ -1,7 +1,7 @@
 package server
 
 import (
-  "github.com/ugosan/logshark/cmd/config"
+  "github.com/ugosan/logshark/v1/config"
   "fmt"
   "log"
   "io/ioutil"
@@ -17,21 +17,27 @@ type Stats struct {
   Events int
   EpsT0 int
   Eps int
+  MaxEvents int
 }
 
 var configflags config.Config
 
-var currentStats = Stats{0, 0, 0}
+var currentStats = Stats{0, 0, 0, 0}
 var channel = make(chan map[string]interface{})
 
 func addEvent(jsonBody string){
-  
-  var obj map[string]interface{}
-  json.Unmarshal([]byte(jsonBody), &obj)
 
-  channel <- obj
+  if(currentStats.Events < configflags.MaxEvents){
+  
+    var obj map[string]interface{}
+    json.Unmarshal([]byte(jsonBody), &obj)
+
+    channel <- obj
+
+  }
 
   currentStats.Events += 1
+
 }
 
 func updateEps() {
@@ -42,6 +48,7 @@ func updateEps() {
     case <-ticker:
       currentStats.Eps = currentStats.Events - currentStats.EpsT0
       currentStats.EpsT0 = currentStats.Events
+      currentStats.MaxEvents = configflags.MaxEvents
     }
   }
 }
@@ -129,7 +136,7 @@ func GetStats() Stats {
 }
 
 func ResetStats() Stats {
-  currentStats = Stats{0, 0, 0}
+  currentStats = Stats{0, 0, 0, configflags.MaxEvents}
   return currentStats
 }
 

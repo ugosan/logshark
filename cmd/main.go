@@ -2,8 +2,8 @@ package main
 
 
 import (
-  "github.com/ugosan/logshark/cmd/ui"
-  "github.com/ugosan/logshark/cmd/config"
+  "github.com/ugosan/logshark/v1/ui"
+  "github.com/ugosan/logshark/v1/config"
   "flag"
   "log"
   "os"
