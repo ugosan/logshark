@@ -2,6 +2,7 @@ package server
 
 import (
   "github.com/ugosan/logshark/v1/config"
+  "github.com/ugosan/logshark/v1/logging"
   "fmt"
   "log"
   "io/ioutil"
@@ -145,14 +146,14 @@ func Start(c chan map[string]interface{}, config config.Config) {
   
   configflags = config
 
+  logs := logging.GetManager()
   
 
-  log.Print("Listening "+config.Host+":"+config.Port)
+  logs.Log("Listening on "+config.Host+":"+config.Port)
 
   http.HandleFunc("/", home)
   http.HandleFunc("/_bulk", bulk)
 
- 
   channel = c
 
   go updateEps()

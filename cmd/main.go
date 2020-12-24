@@ -4,9 +4,9 @@ package main
 import (
   "github.com/ugosan/logshark/v1/ui"
   "github.com/ugosan/logshark/v1/config"
+  "github.com/ugosan/logshark/v1/logging"
+
   "flag"
-  "log"
-  "os"
 )
 
 
@@ -21,15 +21,13 @@ func main() {
 
   flag.Parse()  
 
-  f, err := os.OpenFile(config.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-  if err != nil {
-    log.Println(err)
+  if(config.LogFile != "/dev/null"){
+    logs := logging.GetManager()
+    logs.InitLogger(config)
+    logs.Log(config)    
   }
-  defer f.Close()
 
-  log := log.New(f, "[main] ", log.LstdFlags)
-  log.Println(config)
+
 
   ui.Start(config)
-
 }
