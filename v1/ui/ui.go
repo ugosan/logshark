@@ -23,6 +23,9 @@ var (
   eventView = logshark_widgets.NewParagraph()
   footer = logshark_widgets.NewFooter()
   grid = ui.NewGrid()
+  logs = logging.GetManager()
+  
+  
 
   keysRegex, _ = regexp.Compile(`(\[37m)(.*?)(\[0m)`)
   stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
@@ -83,6 +86,7 @@ func updateEventView() {
     eventView.Text = events[eventList.SelectedRow]
 
     ui.Render(eventList, eventView)
+    logs.Log("updateEventView")
   }
 
 }
@@ -101,8 +105,6 @@ func updateStats() {
 
 func Start(config config.Config) {
 
-  logs := logging.GetManager()
-  
   go server.Start(channel, config)
 
   if err := ui.Init(); err != nil {

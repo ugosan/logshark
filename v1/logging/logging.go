@@ -21,7 +21,7 @@ var (
 func GetManager() *logmanager {
 	
 	once.Do(func() {
-		singleton = &logmanager{state: "off", logger: log.New()}
+		singleton = &logmanager{ logger: log.New()}
 	})
 
 	return singleton
