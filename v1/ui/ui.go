@@ -86,7 +86,6 @@ func updateEventView() {
     eventView.Text = events[eventList.SelectedRow]
 
     ui.Render(eventList, eventView)
-    logs.Log("updateEventView")
   }
 
 }
@@ -94,10 +93,7 @@ func updateEventView() {
 func updateStats() {
 
   stats := fmt.Sprintf(" %d/%d | %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
-  
-  for i := len(stats); i <= termWidth; i++ {
-    stats += "-"
-  }
+
   footer.Text = stats
   ui.Render(footer)
 }
@@ -115,7 +111,9 @@ func Start(config config.Config) {
   formatter.Indent = 2
   eventView.Title = "preview"
   footer.Border = false
-  footer.TextStyle.Bg = ui.ColorBlue
+  footer.WrapText = false
+  footer.TextStyle.Fg = ui.ColorBlack
+  footer.TextStyle.Bg = ui.ColorWhite
 
   eventList.Title = "List"
   eventList.TextStyle = ui.NewStyle(ui.ColorYellow)

@@ -3,7 +3,6 @@ package widgets
 
 import (
 	"image"
-
 	. "github.com/gizak/termui/v3"
 )
 
@@ -24,15 +23,21 @@ func NewFooter() *Footer {
 
 
 func (self *Footer) Draw(buf *Buffer) {
-	//no padding
+	// no padding
 	self.Block.Inner = image.Rect(
 		self.Block.Min.X,
 		self.Block.Min.Y,
 		self.Block.Max.X,
 		self.Block.Max.Y,
 	)
-	self.Block.Draw(buf)
+	
+	// fills the remaining space so it takes the whole row
+	for i := len(self.Text); i < self.Block.Max.X; i++ {
+    self.Text += " "
+	}
 
+	self.Block.Draw(buf)
+	
 	cells := ParseStyles(self.Text, self.TextStyle)
 	if self.WrapText {
 		cells = WrapCells(cells, uint(self.Inner.Dx()))
