@@ -96,6 +96,24 @@ func updateStats() {
 	ui.Render(stats)
 }
 
+func resize(width int, height int) {
+	ui.Clear()
+
+	grid.SetRect(0, 0, width, height-2)
+
+	grid.Set(
+		ui.NewRow(1,
+			ui.NewCol(0.2, eventList),
+			ui.NewCol(0.8, eventView),
+		),
+	)
+
+	footer.SetRect(0, height-1, width, height)
+	stats.SetRect(0, height-2, width, height-1)
+
+	ui.Render(grid, stats, footer)
+}
+
 func Start(config config.Config) {
 
 	go server.Start(channel, config)
@@ -124,17 +142,7 @@ func Start(config config.Config) {
 	grid := ui.NewGrid()
 	termWidth, termHeight = ui.TerminalDimensions()
 
-	grid.SetRect(0, 0, termWidth, termHeight-2)
-
-	grid.Set(
-		ui.NewRow(1,
-			ui.NewCol(0.2, eventList),
-			ui.NewCol(0.8, eventView),
-		),
-	)
-
-	footer.SetRect(0, termHeight-1, termWidth, termHeight)
-	stats.SetRect(0, termHeight-2, termWidth, termHeight-1)
+	resize(termWidth, termHeight)
 
 	footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 
@@ -166,13 +174,8 @@ func Start(config config.Config) {
 			case "<Resize>":
 				payload := e.Payload.(ui.Resize)
 
-				termWidth = payload.Width
-				termHeight = payload.Height
+				resize(payload.Width, payload.Height)
 
-				grid.SetRect(0, 0, termWidth, termHeight-1)
-				footer.SetRect(0, payload.Height-1, payload.Width, payload.Height)
-				ui.Clear()
-				ui.Render(grid)
 			}
 		case <-ticker:
 			updateStats()
