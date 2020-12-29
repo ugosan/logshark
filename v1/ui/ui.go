@@ -1,20 +1,20 @@
 package ui
 
-
 import (
+	"encoding/json"
+	"fmt"
+	"regexp"
+	"time"
+
+	"github.com/TylerBrock/colorjson"
+	ui "github.com/gizak/termui/v3"
+	"github.com/gizak/termui/v3/widgets"
+	"github.com/ugosan/logshark/v1/config"
+	"github.com/ugosan/logshark/v1/logging"
 	"github.com/ugosan/logshark/v1/server"
-  "github.com/ugosan/logshark/v1/config"
-  "github.com/ugosan/logshark/v1/logging"
-  logshark_widgets "github.com/ugosan/logshark/v1/widgets"
-  "github.com/TylerBrock/colorjson"
-  ui "github.com/gizak/termui/v3"
-  "github.com/gizak/termui/v3/widgets"
-  "fmt"
-  "time"
-  "regexp"
-  "encoding/json"
+	logshark_widgets "github.com/ugosan/logshark/v1/widgets"
 )
-  
+
 var (
   channel = make(chan map[string]interface{})
   events []string
@@ -37,57 +37,56 @@ var (
   formatter = colorjson.NewFormatter()
 )
 
+func readEvents() {
 
-func readEvents(){
+	for {
+		obj := <-channel
 
-  for {
-    obj := <-channel
+		prettyJson, _ := formatter.Marshal(obj)
+		events = append(events, translateANSI(string(prettyJson)))
 
-    prettyJson, _ := formatter.Marshal(obj)
-    events = append(events, translateANSI(string(prettyJson)))
-    
-    s, _ := json.Marshal(obj)
-    eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
+		s, _ := json.Marshal(obj)
+		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
-    redrawFlag = true
-  }
+		redrawFlag = true
+	}
 
 }
 
 //instead of redrawing at every event, redraws every 300 microseconds
 func redraw() {
-  if(redrawFlag){
-      
-    ui.Render(eventView, eventList, footer)
-    redrawFlag = false
-  }
+	if redrawFlag {
+
+		ui.Render(eventView, eventList, footer)
+		redrawFlag = false
+	}
 }
 
 func reset() {
-  events = events[:0]
-  eventList.Rows = []string{}
-  eventView.Text = ""
-  server.ResetStats()
+	events = events[:0]
+	eventList.Rows = []string{}
+	eventView.Text = ""
+	server.ResetStats()
 }
 
 func translateANSI(s string) string {
 
-  s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow)")
-  s = numbersRegex.ReplaceAllString(s, "<$2>(fg:magenta)")
-  s = keysRegex.ReplaceAllString(s, "<$2>(fg:blue)")
-  s = booleanRegex.ReplaceAllString(s, "<$2>(fg:green)")
+	s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow)")
+	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:magenta)")
+	s = keysRegex.ReplaceAllString(s, "<$2>(fg:blue)")
+	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:green)")
 
-  return s
+	return s
 }
 
 func updateEventView() {
 
-  if(eventList.SelectedRow>-1){
+	if eventList.SelectedRow > -1 {
 
-    eventView.Text = events[eventList.SelectedRow]
+		eventView.Text = events[eventList.SelectedRow]
 
-    ui.Render(eventList, eventView)
-  }
+		ui.Render(eventList, eventView)
+	}
 
 }
 
@@ -98,7 +97,6 @@ func updateStats() {
   stats.Text = statsText
   ui.Render(stats)
 }
-
 
 func Start(config config.Config) {
 

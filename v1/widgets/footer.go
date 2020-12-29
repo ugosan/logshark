@@ -1,8 +1,8 @@
-
 package widgets
 
 import (
 	"image"
+
 	. "github.com/gizak/termui/v3"
 	"github.com/ugosan/logshark/v1/logging"
 )
@@ -26,7 +26,6 @@ func NewFooter() *Footer {
 	}
 }
 
-
 func (self *Footer) Draw(buf *Buffer) {
 	// no padding
 	self.Block.Inner = image.Rect(
@@ -37,7 +36,7 @@ func (self *Footer) Draw(buf *Buffer) {
 	)
 	
 	self.Block.Draw(buf)
-	
+
 	cells := ParseStyles(self.Text, self.TextStyle)
 	
 	runes := []rune(" ")
