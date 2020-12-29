@@ -1,47 +1,57 @@
 package logging
 
 import (
-	"io/ioutil"
-	"os"
-	"sync"
+  "io/ioutil"
+  "os"
+  "sync"
+  nested "github.com/antonfisher/nested-logrus-formatter"
+  log "github.com/sirupsen/logrus"
+  "github.com/ugosan/logshark/v1/config"
 
-	log "github.com/sirupsen/logrus"
-	"github.com/ugosan/logshark/v1/config"
 )
 
 type logmanager struct {
-	logger *log.Logger
+  logger *log.Logger
 }
 
+
 var (
-	singleton *logmanager
-	once      sync.Once
+  singleton *logmanager
+  once      sync.Once
 )
+
+
 
 func GetManager() *logmanager {
 
-	once.Do(func() {
-		singleton = &logmanager{logger: log.New()}
-	})
+  once.Do(func() {
+    singleton = &logmanager{logger: log.New()}
+    singleton.logger.SetOutput(ioutil.Discard)
+  })
 
-	return singleton
+  return singleton
 }
 
-func (sm *logmanager) Log(s interface{}) {
-	sm.logger.Println(s)
+func (lm *logmanager) Log(s interface{}) {
+  lm.logger.Println(s)
 }
 
-func (sm *logmanager) InitLogger(config config.Config) {
+func (lm *logmanager) InitLogger(config config.Config) {
 
-	if config.LogFile == "/dev/null" {
-		sm.logger.SetOutput(ioutil.Discard)
-	} else {
-		f, err := os.OpenFile(config.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			log.Println(err)
-		}
+  f, err := os.OpenFile(config.LogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+  if err != nil {
+    log.Println(err)
+  }
 
-		sm.logger.SetOutput(f)
-	}
+  customFormatter := new(log.TextFormatter)
+  customFormatter.TimestampFormat = "2006-01-02 15:04:05"
+  lm.logger.SetFormatter(&nested.Formatter{
+    HideKeys:    true,
+    FieldsOrder: []string{"component", "category"},
+  })
+
+
+  lm.logger.SetOutput(f)
+
 
 }

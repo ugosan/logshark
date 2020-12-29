@@ -13,7 +13,6 @@ import (
   "time"
 )
 
-
 type Stats struct {
   Events int
   EpsT0 int
@@ -21,10 +20,13 @@ type Stats struct {
   MaxEvents int
 }
 
-var configflags config.Config
+var (
+  configflags config.Config
 
-var currentStats = Stats{0, 0, 0, 0}
-var channel = make(chan map[string]interface{})
+  currentStats = Stats{0, 0, 0, 0}
+  channel = make(chan map[string]interface{})
+  logs = logging.GetManager()
+)
 
 func addEvent(jsonBody string){
 
@@ -129,6 +131,7 @@ func SendTestRequest(){
     print(err)
   }
 
+
   defer resp.Body.Close()
 }
 
@@ -145,9 +148,6 @@ func ResetStats() Stats {
 func Start(c chan map[string]interface{}, config config.Config) {
   
   configflags = config
-
-  logs := logging.GetManager()
-  
 
   logs.Log("Listening on "+config.Host+":"+config.Port)
 

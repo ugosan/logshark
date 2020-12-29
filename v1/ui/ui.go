@@ -22,6 +22,7 @@ var (
   eventList = widgets.NewList()
   eventView = logshark_widgets.NewParagraph()
   footer = logshark_widgets.NewFooter()
+  stats = logshark_widgets.NewFooter()
   grid = ui.NewGrid()
   logs = logging.GetManager()
   
@@ -92,10 +93,10 @@ func updateEventView() {
 
 func updateStats() {
 
-  stats := fmt.Sprintf(" %d/%d | %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
+  statsText := fmt.Sprintf(" %d/%d | %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
 
-  footer.Text = stats
-  ui.Render(footer)
+  stats.Text = statsText
+  ui.Render(stats)
 }
 
 
@@ -115,6 +116,12 @@ func Start(config config.Config) {
   footer.TextStyle.Fg = ui.ColorBlack
   footer.TextStyle.Bg = ui.ColorWhite
 
+
+  stats.Border = false
+  stats.WrapText = false
+  stats.TextStyle.Fg = ui.ColorWhite
+  stats.TextStyle.Bg = ui.ColorBlack
+
   eventList.Title = "List"
   eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
   eventList.WrapText = false
@@ -122,7 +129,7 @@ func Start(config config.Config) {
   grid := ui.NewGrid()
   termWidth, termHeight = ui.TerminalDimensions()
   
-  grid.SetRect(0, 0, termWidth, termHeight-1)
+  grid.SetRect(0, 0, termWidth, termHeight-2)
 
   grid.Set(
     ui.NewRow(1,
@@ -132,6 +139,9 @@ func Start(config config.Config) {
   )
 
   footer.SetRect(0, termHeight-1, termWidth, termHeight)
+  stats.SetRect(0, termHeight-2, termWidth, termHeight-1)
+
+  footer.Text = " [r](fg:yellow)eset"
 
   ui.Render(grid)
   
