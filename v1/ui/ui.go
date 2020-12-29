@@ -139,7 +139,7 @@ func Start(config config.Config) {
   footer.SetRect(0, termHeight-1, termWidth, termHeight)
   stats.SetRect(0, termHeight-2, termWidth, termHeight-1)
 
-  footer.Text = " [r](fg:yellow)eset"
+  footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 
   ui.Render(grid)
   

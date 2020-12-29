@@ -21,13 +21,10 @@ type Stats struct {
 	MaxEvents int
 }
 
-var (
-  configflags config.Config
+var configflags config.Config
 
-  currentStats = Stats{0, 0, 0, 0}
-  channel = make(chan map[string]interface{})
-  logs = logging.GetManager()
-)
+var currentStats = Stats{0, 0, 0, 0}
+var channel = make(chan map[string]interface{})
 
 func addEvent(jsonBody string) {
 
@@ -129,8 +126,7 @@ func SendTestRequest() {
 		print(err)
 	}
 
-
-  defer resp.Body.Close()
+	defer resp.Body.Close()
 }
 
 func GetStats() Stats {
@@ -144,7 +140,11 @@ func ResetStats() Stats {
 
 func Start(c chan map[string]interface{}, config config.Config) {
 
-  logs.Log("Listening on "+config.Host+":"+config.Port)
+	configflags = config
+
+	logs := logging.GetManager()
+
+	logs.Log("Listening on " + config.Host + ":" + config.Port)
 
 	http.HandleFunc("/", home)
 	http.HandleFunc("/_bulk", bulk)
