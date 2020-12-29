@@ -173,9 +173,7 @@ func Start(config config.Config) {
 				ui.Render(grid)
 			case "<Resize>":
 				payload := e.Payload.(ui.Resize)
-
 				resize(payload.Width, payload.Height)
-
 			}
 		case <-ticker:
 			updateStats()
