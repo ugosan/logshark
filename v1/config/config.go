@@ -1,7 +1,8 @@
 package config
+
 type Config struct {
-  Host string
-  Port string
+	Host      string
+	Port      string
 	MaxEvents int
-	LogFile string
+	LogFile   string
 }
