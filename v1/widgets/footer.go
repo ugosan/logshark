@@ -34,11 +34,11 @@ func (self *Footer) Draw(buf *Buffer) {
 		self.Block.Max.X,
 		self.Block.Max.Y,
 	)
-	
+
 	self.Block.Draw(buf)
 
 	cells := ParseStyles(self.Text, self.TextStyle)
-	
+
 	runes := []rune(" ")
 
 	cellsLength := len(cells)
