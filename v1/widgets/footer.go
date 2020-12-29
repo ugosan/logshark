@@ -4,6 +4,11 @@ package widgets
 import (
 	"image"
 	. "github.com/gizak/termui/v3"
+	"github.com/ugosan/logshark/v1/logging"
+)
+
+var (
+	logs = logging.GetManager()
 )
 
 type Footer struct {
@@ -31,28 +36,19 @@ func (self *Footer) Draw(buf *Buffer) {
 		self.Block.Max.Y,
 	)
 	
-	// fills the remaining space so it takes the whole row
-	for i := len(self.Text); i < self.Block.Max.X; i++ {
-    self.Text += " "
-	}
-
 	self.Block.Draw(buf)
 	
 	cells := ParseStyles(self.Text, self.TextStyle)
-	if self.WrapText {
-		cells = WrapCells(cells, uint(self.Inner.Dx()))
+	
+	runes := []rune(" ")
+
+	cellsLength := len(cells)
+	for i := cellsLength; i < self.Block.Max.X; i++ {
+		cells = append(cells, Cell{runes[0], self.TextStyle})
 	}
 
-	rows := SplitCells(cells, '\n')
-
-	for y, row := range rows {
-		if y+self.Inner.Min.Y >= self.Inner.Max.Y {
-			break
-		}
-		row = TrimCells(row, self.Inner.Dx())
-		for _, cx := range BuildCellWithXArray(row) {
-			x, cell := cx.X, cx.Cell
-			buf.SetCell(cell, image.Pt(x, y).Add(self.Inner.Min))
-		}
+	for _, cx := range BuildCellWithXArray(cells) {
+		x, cell := cx.X, cx.Cell
+		buf.SetCell(cell, image.Pt(x, 0).Add(self.Inner.Min))
 	}
 }
