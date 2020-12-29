@@ -124,7 +124,7 @@ func Start(config config.Config) {
 	defer ui.Close()
 
 	formatter.Indent = 2
-	eventView.Title = "preview"
+	eventView.Title = "Preview"
 	footer.Border = false
 	footer.WrapText = false
 	footer.TextStyle.Fg = ui.ColorBlack
@@ -135,7 +135,7 @@ func Start(config config.Config) {
 	stats.TextStyle.Fg = ui.ColorWhite
 	stats.TextStyle.Bg = ui.ColorBlack
 
-	eventList.Title = "List"
+	eventList.Title = "Events"
 	eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
 	eventList.WrapText = false
 
@@ -144,7 +144,7 @@ func Start(config config.Config) {
 
 	resize(termWidth, termHeight)
 
-	footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
+	footer.Text = " [q](fg:yellow)uit  [r](fg:yellow)eset"
 
 	ui.Render(grid)
 
