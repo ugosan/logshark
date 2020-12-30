@@ -37,7 +37,7 @@ func addEvent(jsonBody string) {
 
 	}
 
-	currentStats.Events += 1
+	currentStats.Events++
 
 }
 
@@ -101,7 +101,7 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 			if currentStats.Events < configflags.MaxEvents {
 				addEvent(splits[i])
 			} else {
-				currentStats.Events += 1
+				currentStats.Events++
 			}
 
 		}
