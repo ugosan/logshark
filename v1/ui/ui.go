@@ -10,7 +10,8 @@ import (
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/ugosan/logshark/v1/config"
-	"github.com/ugosan/logshark/v1/logging"
+  "github.com/ugosan/logshark/v1/logging"
+  "github.com/ugosan/logshark/v1/ansi8bit"
 	"github.com/ugosan/logshark/v1/server"
 	logshark_widgets "github.com/ugosan/logshark/v1/widgets"
 )
@@ -71,10 +72,10 @@ func reset() {
 
 func translateANSI(s string) string {
 
-	s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow)")
+	s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow2)")
 	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:magenta)")
 	s = keysRegex.ReplaceAllString(s, "<$2>(fg:blue)")
-	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:green)")
+	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:darkseagreen3)")
 
 	return s
 }
@@ -111,17 +112,17 @@ func Start(config config.Config) {
   eventView.Title = "preview"
   footer.Border = false
   footer.WrapText = false
-  footer.TextStyle.Fg = ui.ColorBlack
+  footer.TextStyle.Fg = ansi8bit.DarkViolet
   footer.TextStyle.Bg = ui.ColorWhite
 
 
   stats.Border = false
   stats.WrapText = false
   stats.TextStyle.Fg = ui.ColorWhite
-  stats.TextStyle.Bg = ui.ColorBlack
+  stats.TextStyle.Bg = ansi8bit.DarkViolet
 
   eventList.Title = "List"
-  eventList.TextStyle = ui.NewStyle(ui.ColorYellow)
+  eventList.TextStyle = ui.NewStyle(ansi8bit.Orange3)
   eventList.WrapText = false
 
   grid := ui.NewGrid()
