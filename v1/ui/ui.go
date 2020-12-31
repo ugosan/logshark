@@ -71,9 +71,9 @@ func reset() {
 func translateANSI(s string) string {
 
 	s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow2)")
-	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:magenta)")
+	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:darkviolet)")
 	s = keysRegex.ReplaceAllString(s, "<$2>(fg:blue)")
-	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:darkseagreen3)")
+	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:purple4)")
 
 	return s
 }
@@ -125,7 +125,7 @@ func Start(config config.Config) {
   defer ui.Close()
 
   formatter.Indent = 2
-  eventView.Title = "preview"
+  eventView.Title = ""
   footer.Border = false
   footer.WrapText = false
   footer.TextStyle.Fg = ansi8bit.DarkViolet
@@ -137,29 +137,17 @@ func Start(config config.Config) {
   stats.TextStyle.Fg = ui.ColorWhite
   stats.TextStyle.Bg = ansi8bit.DarkViolet
 
-  eventList.Title = "List"
+  eventList.Title = "Events"
   eventList.TextStyle = ui.NewStyle(ansi8bit.Orange3)
   eventList.WrapText = false
 
   grid := ui.NewGrid()
   termWidth, termHeight = ui.TerminalDimensions()
   
-  grid.SetRect(0, 0, termWidth, termHeight-2)
-
-  grid.Set(
-    ui.NewRow(1,
-      ui.NewCol(0.2, eventList),
-      ui.NewCol(0.8, eventView),
-    ),
-  )
-
-  footer.SetRect(0, termHeight-1, termWidth, termHeight)
-  stats.SetRect(0, termHeight-2, termWidth, termHeight-1)
+  resize(termWidth, termHeight)
 
   footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 
-  ui.Render(grid)
-  
   go readEvents()
 
   uiEvents := ui.PollEvents()
@@ -186,13 +174,7 @@ func Start(config config.Config) {
       case "<Resize>":
         payload := e.Payload.(ui.Resize)
 
-        termWidth = payload.Width
-        termHeight = payload.Height
-        
-        grid.SetRect(0, 0, termWidth, termHeight-1)
-        footer.SetRect(0, payload.Height-1, payload.Width, payload.Height)
-        ui.Clear()
-        ui.Render(grid)
+        resize(payload.Width, payload.Height)
       }
     case <-ticker:
       updateStats()
