@@ -17,25 +17,23 @@ import (
 )
 
 var (
-  channel = make(chan map[string]interface{})
-  events []string
-  redrawFlag = true
-  eventList = widgets.NewList()
-  eventView = logshark_widgets.NewParagraph()
-  footer = logshark_widgets.NewFooter()
-  stats = logshark_widgets.NewFooter()
-  grid = ui.NewGrid()
-  logs = logging.GetManager()
-  
-  
+	channel    = make(chan map[string]interface{})
+	events     []string
+	redrawFlag = true
+	eventList  = widgets.NewList()
+	eventView  = logshark_widgets.NewParagraph()
+	footer     = logshark_widgets.NewFooter()
+	stats      = logshark_widgets.NewFooter()
+	grid       = ui.NewGrid()
+	logs       = logging.GetManager()
 
-  keysRegex, _ = regexp.Compile(`(\[37m)(.*?)(\[0m)`)
-  stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
-  numbersRegex, _ = regexp.Compile(`(\[36m)(.*?)(\[0m)`)
-  booleanRegex, _ = regexp.Compile(`(\[33m)(.*?)(\[0m)`)
-  termWidth = 0
-  termHeight = 0
-  formatter = colorjson.NewFormatter()
+	keysRegex, _    = regexp.Compile(`(\[37m)(.*?)(\[0m)`)
+	stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
+	numbersRegex, _ = regexp.Compile(`(\[36m)(.*?)(\[0m)`)
+	booleanRegex, _ = regexp.Compile(`(\[33m)(.*?)(\[0m)`)
+	termWidth       = 0
+	termHeight      = 0
+	formatter       = colorjson.NewFormatter()
 )
 
 func readEvents() {
@@ -93,10 +91,28 @@ func updateEventView() {
 
 func updateStats() {
 
-  statsText := fmt.Sprintf(" %d/%d | %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
+	statsText := fmt.Sprintf(" %d/%d | %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
 
-  stats.Text = statsText
-  ui.Render(stats)
+	stats.Text = statsText
+	ui.Render(stats)
+}
+
+func resize(width int, height int) {
+	ui.Clear()
+
+	grid.SetRect(0, 0, width, height-2)
+
+	grid.Set(
+		ui.NewRow(1,
+			ui.NewCol(0.2, eventList),
+			ui.NewCol(0.8, eventView),
+		),
+	)
+
+	footer.SetRect(0, height-1, width, height)
+	stats.SetRect(0, height-2, width, height-1)
+
+	ui.Render(grid, stats, footer)
 }
 
 func Start(config config.Config) {
