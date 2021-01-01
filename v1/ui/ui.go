@@ -83,19 +83,16 @@ func updateEventView() {
 
 	if eventList.SelectedRow > -1 {
 
-		//eventView.Text = events[eventList.SelectedRow]
-
 		ui.Render(eventList, eventView)
 
 		eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
 
-		//for _, line := range strings.Split(events[eventList.SelectedRow], "\n"){
-		//	eventView.Rows =
-
-		//}
-
 	}
 
+}
+
+func switchFocus() {
+	//eventView.BorderStyle.Fg = ansi8bit.DarkViolet
 }
 
 func updateStats() {
