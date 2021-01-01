@@ -158,10 +158,10 @@ func Start(config config.Config) {
 	stats.TextStyle.Bg = ansi8bit.DarkViolet
 
 	eventList.Title = "Events ●"
-	eventList.TextStyle = ui.NewStyle(ansi8bit.Orange3)
+	eventList.TextStyle = ui.NewStyle(ansi8bit.Yellow1)
 	eventList.WrapText = false
 
-	eventList.BorderStyle.Fg = ansi8bit.Grey69
+	eventList.BorderStyle.Fg = ansi8bit.White
 	eventView.BorderStyle.Fg = ansi8bit.Grey69
 
 	grid := ui.NewGrid()
@@ -217,7 +217,6 @@ func Start(config config.Config) {
 		case <-ticker:
 			updateStats()
 
-			//logs.Log(len(eventList.Rows))
 			if len(eventList.Rows) == 1 {
 				eventList.SelectedRow = 0
 				updateEventView()
