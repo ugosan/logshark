@@ -35,6 +35,8 @@ var (
 	termWidth       = 0
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
+
+	focused interface{}
 )
 
 func readEvents() {
@@ -90,7 +92,17 @@ func updateEventView() {
 }
 
 func switchFocus() {
-	//eventView.BorderStyle.Fg = ansi8bit.DarkViolet
+
+	if focused == eventList {
+		focused = eventView
+		eventList.BorderStyle.Fg = ansi8bit.DarkSlateGray3
+		eventView.BorderStyle.Fg = ansi8bit.White
+	} else {
+		focused = eventList
+		eventList.BorderStyle.Fg = ansi8bit.White
+		eventView.BorderStyle.Fg = ansi8bit.DarkSlateGray3
+	}
+
 }
 
 func updateStats() {
@@ -151,6 +163,8 @@ func Start(config config.Config) {
 
 	footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 
+	focused = eventList
+
 	go readEvents()
 
 	uiEvents := ui.PollEvents()
@@ -169,6 +183,9 @@ func Start(config config.Config) {
 			case "<Up>":
 				eventList.ScrollUp()
 				updateEventView()
+				ui.Render(eventList, eventView)
+			case "<Tab>":
+				switchFocus()
 				ui.Render(eventList, eventView)
 			case "r":
 				reset()
