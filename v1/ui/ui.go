@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/TylerBrock/colorjson"
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
+	"github.com/ugosan/logshark/v1/ansi8bit"
 	"github.com/ugosan/logshark/v1/config"
-  "github.com/ugosan/logshark/v1/logging"
-  "github.com/ugosan/logshark/v1/ansi8bit"
+	"github.com/ugosan/logshark/v1/logging"
 	"github.com/ugosan/logshark/v1/server"
 	logshark_widgets "github.com/ugosan/logshark/v1/widgets"
 )
@@ -21,7 +22,7 @@ var (
 	events     []string
 	redrawFlag = true
 	eventList  = widgets.NewList()
-	eventView  = logshark_widgets.NewParagraph()
+	eventView  = logshark_widgets.NewJSONView()
 	footer     = logshark_widgets.NewFooter()
 	stats      = logshark_widgets.NewFooter()
 	grid       = ui.NewGrid()
@@ -64,7 +65,7 @@ func redraw() {
 func reset() {
 	events = events[:0]
 	eventList.Rows = []string{}
-	eventView.Text = ""
+	//eventView.Text = ""
 	server.ResetStats()
 }
 
@@ -82,16 +83,24 @@ func updateEventView() {
 
 	if eventList.SelectedRow > -1 {
 
-		eventView.Text = events[eventList.SelectedRow]
+		//eventView.Text = events[eventList.SelectedRow]
 
 		ui.Render(eventList, eventView)
+
+		eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
+
+		//for _, line := range strings.Split(events[eventList.SelectedRow], "\n"){
+		//	eventView.Rows =
+
+		//}
+
 	}
 
 }
 
 func updateStats() {
 
-	statsText := fmt.Sprintf(" %d/%d | %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
+	statsText := fmt.Sprintf(" [%d](fg:white)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
 
 	stats.Text = statsText
 	ui.Render(stats)
@@ -117,74 +126,75 @@ func resize(width int, height int) {
 
 func Start(config config.Config) {
 
-  go server.Start(channel, config)
+	go server.Start(channel, config)
 
-  if err := ui.Init(); err != nil {
-    logs.Log(err)
-  }
-  defer ui.Close()
+	if err := ui.Init(); err != nil {
+		logs.Log(err)
+	}
+	defer ui.Close()
 
-  formatter.Indent = 2
-  eventView.Title = ""
-  footer.Border = false
-  footer.WrapText = false
-  footer.TextStyle.Fg = ansi8bit.DarkViolet
-  footer.TextStyle.Bg = ui.ColorWhite
+	formatter.Indent = 2
+	eventView.Title = ""
+	footer.Border = false
+	footer.WrapText = false
+	footer.TextStyle.Fg = ansi8bit.DarkViolet
+	footer.TextStyle.Bg = ui.ColorWhite
 
+	stats.Border = false
+	stats.WrapText = false
+	stats.TextStyle.Fg = ui.ColorWhite
+	stats.TextStyle.Bg = ansi8bit.DarkViolet
 
-  stats.Border = false
-  stats.WrapText = false
-  stats.TextStyle.Fg = ui.ColorWhite
-  stats.TextStyle.Bg = ansi8bit.DarkViolet
+	eventList.Title = "Events"
+	eventList.TextStyle = ui.NewStyle(ansi8bit.Orange3)
+	eventList.WrapText = false
 
-  eventList.Title = "Events"
-  eventList.TextStyle = ui.NewStyle(ansi8bit.Orange3)
-  eventList.WrapText = false
+	grid := ui.NewGrid()
+	termWidth, termHeight = ui.TerminalDimensions()
 
-  grid := ui.NewGrid()
-  termWidth, termHeight = ui.TerminalDimensions()
-  
-  resize(termWidth, termHeight)
+	resize(termWidth, termHeight)
 
-  footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
+	footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 
-  go readEvents()
+	go readEvents()
 
-  uiEvents := ui.PollEvents()
-  ticker := time.NewTicker(time.Microsecond*300).C
+	uiEvents := ui.PollEvents()
+	ticker := time.NewTicker(time.Microsecond * 300).C
 
-  for {
-    select {
-    case e := <-uiEvents:
-      switch e.ID {
-      case "q", "<C-c>":
-        return
-      case "<Down>":
-        eventList.ScrollDown()
-        updateEventView()
-      case "<Up>":
-        eventList.ScrollUp()
-        updateEventView()
-      case "r":
-        reset()
-        ui.Render(grid)
-      case "t":
-        server.SendTestRequest()
-        ui.Render(grid)
-      case "<Resize>":
-        payload := e.Payload.(ui.Resize)
+	for {
+		select {
+		case e := <-uiEvents:
+			switch e.ID {
+			case "q", "<C-c>":
+				return
+			case "<Down>":
+				eventList.ScrollDown()
+				updateEventView()
+			case "<Up>":
+				eventList.ScrollUp()
+				updateEventView()
+			case "r":
+				reset()
+				ui.Render(grid)
+			case "t":
+				server.SendTestRequest()
+				ui.Render(grid)
+			case "<Resize>":
+				payload := e.Payload.(ui.Resize)
 
-        resize(payload.Width, payload.Height)
-      }
-    case <-ticker:
-      updateStats()
-      if(len(eventList.Rows) == 1){
-        eventList.SelectedRow = 0
-        updateEventView()
-      }
-      
-      redraw()
-    }
-  }
+				resize(payload.Width, payload.Height)
+			}
+		case <-ticker:
+			updateStats()
+
+			//logs.Log(len(eventList.Rows))
+			if len(eventList.Rows) == 1 {
+				eventList.SelectedRow = 0
+				updateEventView()
+			}
+
+			redraw()
+		}
+	}
 
 }
