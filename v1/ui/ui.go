@@ -95,12 +95,16 @@ func switchFocus() {
 
 	if focused == eventList {
 		focused = eventView
-		eventList.BorderStyle.Fg = ansi8bit.DarkSlateGray3
+		eventList.BorderStyle.Fg = ansi8bit.Grey69
 		eventView.BorderStyle.Fg = ansi8bit.White
+		eventList.Title = "Events"
+		eventView.Title = "JSON ●"
 	} else {
 		focused = eventList
 		eventList.BorderStyle.Fg = ansi8bit.White
-		eventView.BorderStyle.Fg = ansi8bit.DarkSlateGray3
+		eventView.BorderStyle.Fg = ansi8bit.Grey69
+		eventList.Title = "Events ●"
+		eventView.Title = "JSON"
 	}
 
 }
@@ -141,7 +145,8 @@ func Start(config config.Config) {
 	defer ui.Close()
 
 	formatter.Indent = 2
-	eventView.Title = ""
+	eventView.Title = "JSON"
+
 	footer.Border = false
 	footer.WrapText = false
 	footer.TextStyle.Fg = ansi8bit.DarkViolet
@@ -152,9 +157,12 @@ func Start(config config.Config) {
 	stats.TextStyle.Fg = ui.ColorWhite
 	stats.TextStyle.Bg = ansi8bit.DarkViolet
 
-	eventList.Title = "Events"
+	eventList.Title = "Events ●"
 	eventList.TextStyle = ui.NewStyle(ansi8bit.Orange3)
 	eventList.WrapText = false
+
+	eventList.BorderStyle.Fg = ansi8bit.Grey69
+	eventView.BorderStyle.Fg = ansi8bit.Grey69
 
 	grid := ui.NewGrid()
 	termWidth, termHeight = ui.TerminalDimensions()
@@ -177,12 +185,20 @@ func Start(config config.Config) {
 			case "q", "<C-c>":
 				return
 			case "<Down>":
-				eventList.ScrollDown()
-				updateEventView()
+				if focused == eventList {
+					eventList.ScrollDown()
+					updateEventView()
+				} else {
+					eventView.ScrollDown()
+				}
 				ui.Render(eventList, eventView)
 			case "<Up>":
-				eventList.ScrollUp()
-				updateEventView()
+				if focused == eventList {
+					eventList.ScrollUp()
+					updateEventView()
+				} else {
+					eventView.ScrollUp()
+				}
 				ui.Render(eventList, eventView)
 			case "<Tab>":
 				switchFocus()
