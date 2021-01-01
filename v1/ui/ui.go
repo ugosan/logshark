@@ -65,7 +65,7 @@ func redraw() {
 func reset() {
 	events = events[:0]
 	eventList.Rows = []string{}
-	//eventView.Text = ""
+	eventView.Rows = []string{}
 	server.ResetStats()
 }
 
@@ -82,8 +82,6 @@ func translateANSI(s string) string {
 func updateEventView() {
 
 	if eventList.SelectedRow > -1 {
-
-		ui.Render(eventList, eventView)
 
 		eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
 
@@ -167,9 +165,11 @@ func Start(config config.Config) {
 			case "<Down>":
 				eventList.ScrollDown()
 				updateEventView()
+				ui.Render(eventList, eventView)
 			case "<Up>":
 				eventList.ScrollUp()
 				updateEventView()
+				ui.Render(eventList, eventView)
 			case "r":
 				reset()
 				ui.Render(grid)
