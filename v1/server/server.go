@@ -66,7 +66,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		fmt.Fprintf(w, "{\"name\":\"instance-000000001\",\"cluster_name\":\"dummy-cluster\",\"cluster_uuid\":\"yaVi2rdIQT-v-qN9v4II9Q\",\"version\":{\"number\":\"6.8.3\",\"build_flavor\":\"default\",\"build_type\":\"tar\",\"build_hash\":\"0c48c0e\",\"build_date\":\"2019-08-29T19:05:24.312154Z\",\"build_snapshot\":false,\"lucene_version\":\"7.7.0\",\"minimum_wire_compatibility_version\":\"5.6.0\",\"minimum_index_compatibility_version\":\"5.0.0\"},\"tagline\":\"YouKnow,forSearch\"}")
+		fmt.Fprintf(w, "{\"name\":\"instance-000000001\",\"cluster_name\":\"dummy-cluster\",\"cluster_uuid\":\"yaVi2rdIQT-v-qN9v4II9Q\",\"version\":{\"number\":\"7.10.0\",\"build_flavor\":\"default\",\"build_type\":\"tar\",\"build_hash\":\"0c48c0e\",\"build_date\":\"2019-08-29T19:05:24.312154Z\",\"build_snapshot\":false,\"lucene_version\":\"7.7.0\",\"minimum_wire_compatibility_version\":\"5.6.0\",\"minimum_index_compatibility_version\":\"5.0.0\"},\"tagline\":\"YouKnow,forSearch\"}")
 	case "POST":
 
 		addEvent(string(body))
@@ -171,7 +171,7 @@ func Start(c chan map[string]interface{}, config config.Config) {
 
 	http.HandleFunc("/", home)
 	http.HandleFunc("/_bulk", bulk)
-	http.HandleFunc("_license", license)
+	http.HandleFunc("/_license", license)
 
 	channel = c
 
