@@ -146,6 +146,7 @@ func Start(config config.Config) {
 
 	formatter.Indent = 2
 	eventView.Title = "JSON"
+	eventView.WrapText = true
 
 	footer.Border = false
 	footer.WrapText = false
