@@ -13,6 +13,7 @@ import (
 	"github.com/ugosan/logshark/v1/config"
 	"github.com/ugosan/logshark/v1/logging"
 	"github.com/ugosan/logshark/v1/server"
+	t "github.com/ugosan/logshark/v1/theme"
 	logshark_widgets "github.com/ugosan/logshark/v1/widgets"
 )
 
@@ -37,31 +38,10 @@ var (
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
 
-	theme = Theme{
-		base:      15,
-		disabled:  242,
-		primary:   91,
-		secondary: 220,
-		json1:     1,
-		json2:     1,
-		json3:     1,
-		json4:     1,
-	}
+	theme = t.GetTheme()
 
 	focused interface{}
 )
-
-//Theme uses xterm colors 1-255
-type Theme struct {
-	base      int
-	disabled  int
-	primary   int
-	secondary int
-	json1     int
-	json2     int
-	json3     int
-	json4     int
-}
 
 func readEvents() {
 
@@ -97,10 +77,10 @@ func reset() {
 
 func translateANSI(s string) string {
 
-	s = stringsRegex.ReplaceAllString(s, "<$2>(fg:yellow2)")
-	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:darkviolet)")
-	s = keysRegex.ReplaceAllString(s, "<$2>(fg:blue)")
-	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:purple4)")
+	s = stringsRegex.ReplaceAllString(s, "<$2>(fg:json1)")
+	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:json2)")
+	s = keysRegex.ReplaceAllString(s, "<$2>(fg:json3)")
+	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:json4)")
 
 	return s
 }
@@ -116,14 +96,14 @@ func switchFocus() {
 
 	if focused == eventList {
 		focused = eventView
-		eventList.BorderStyle.Fg = ui.Color(theme.disabled)
-		eventView.BorderStyle.Fg = ui.Color(theme.base)
+		eventList.BorderStyle.Fg = theme.GetColorByName("disabled")
+		eventView.BorderStyle.Fg = theme.GetColorByName("base")
 		eventList.Title = "Events"
 		eventView.Title = "JSON ●"
 	} else {
 		focused = eventList
-		eventList.BorderStyle.Fg = ui.Color(theme.base)
-		eventView.BorderStyle.Fg = ui.Color(theme.disabled)
+		eventList.BorderStyle.Fg = theme.GetColorByName("base")
+		eventView.BorderStyle.Fg = theme.GetColorByName("disabled")
 		eventList.Title = "Events ●"
 		eventView.Title = "JSON"
 	}
@@ -132,7 +112,7 @@ func switchFocus() {
 
 func updateStats() {
 
-	stats.Text = fmt.Sprintf(" [%d](fg:white)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
+	stats.Text = fmt.Sprintf(" [%d](fg:base)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
 	ui.Render(stats)
 }
 
@@ -168,40 +148,42 @@ func Start(config config.Config) {
 
 	formatter.Indent = 2
 
+	theme.SetColors(15, 242, 91, 226, 7, 65, 226, 11)
+
 	grid := ui.NewGrid()
 
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
-	footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
+	footer.Text = " [q](fg:primary)uit [r](fg:primary)eset"
 	footer.Border = false
 	footer.WrapText = false
-	footer.TextStyle.Fg = ui.Color(theme.primary)
-	footer.TextStyle.Bg = ui.Color(theme.base)
+	footer.TextStyle.Fg = theme.GetColorByName("primary")
+	footer.TextStyle.Bg = theme.GetColorByName("base")
 
 	version.Text = "Logshark v1.0"
 	version.Border = false
 	version.WrapText = false
-	version.TextStyle.Fg = ui.Color(theme.primary)
-	version.TextStyle.Bg = ui.Color(theme.base)
+	version.TextStyle.Fg = theme.GetColorByName("primary")
+	version.TextStyle.Bg = theme.GetColorByName("base")
 
 	stats.Border = false
 	stats.WrapText = false
-	stats.TextStyle.Fg = ui.Color(theme.base)
-	stats.TextStyle.Bg = ui.Color(theme.primary)
+	stats.TextStyle.Fg = theme.GetColorByName("base")
+	stats.TextStyle.Bg = theme.GetColorByName("primary")
 
 	serverStatus.Text = fmt.Sprintf("%s:%s", config.Host, config.Port)
 	serverStatus.Border = false
 	serverStatus.WrapText = false
-	serverStatus.TextStyle.Fg = ui.Color(theme.base)
-	serverStatus.TextStyle.Bg = ui.Color(theme.primary)
+	serverStatus.TextStyle.Fg = theme.GetColorByName("base")
+	serverStatus.TextStyle.Bg = theme.GetColorByName("primary")
 
 	eventList.Title = "Events ●"
-	eventList.TextStyle.Fg = ui.Color(theme.secondary)
+	eventList.TextStyle.Fg = theme.GetColorByName("secondary")
 	eventList.WrapText = false
 
-	eventList.BorderStyle.Fg = ui.Color(theme.base)
-	eventView.BorderStyle.Fg = ui.Color(theme.disabled)
+	eventList.BorderStyle.Fg = theme.GetColorByName("base")
+	eventView.BorderStyle.Fg = theme.GetColorByName("disabled")
 
 	termWidth, termHeight = ui.TerminalDimensions()
 
