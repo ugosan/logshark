@@ -10,7 +10,6 @@ import (
 	"github.com/TylerBrock/colorjson"
 	ui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
-	"github.com/ugosan/logshark/v1/ansi8bit"
 	"github.com/ugosan/logshark/v1/config"
 	"github.com/ugosan/logshark/v1/logging"
 	"github.com/ugosan/logshark/v1/server"
@@ -38,8 +37,31 @@ var (
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
 
+	theme = Theme{
+		base:      15,
+		disabled:  242,
+		primary:   91,
+		secondary: 220,
+		json1:     1,
+		json2:     1,
+		json3:     1,
+		json4:     1,
+	}
+
 	focused interface{}
 )
+
+//Theme uses xterm colors 1-255
+type Theme struct {
+	base      int
+	disabled  int
+	primary   int
+	secondary int
+	json1     int
+	json2     int
+	json3     int
+	json4     int
+}
 
 func readEvents() {
 
@@ -94,14 +116,14 @@ func switchFocus() {
 
 	if focused == eventList {
 		focused = eventView
-		eventList.BorderStyle.Fg = ansi8bit.Grey69
-		eventView.BorderStyle.Fg = ansi8bit.White
+		eventList.BorderStyle.Fg = ui.Color(theme.disabled)
+		eventView.BorderStyle.Fg = ui.Color(theme.base)
 		eventList.Title = "Events"
 		eventView.Title = "JSON ●"
 	} else {
 		focused = eventList
-		eventList.BorderStyle.Fg = ansi8bit.White
-		eventView.BorderStyle.Fg = ansi8bit.Grey69
+		eventList.BorderStyle.Fg = ui.Color(theme.base)
+		eventView.BorderStyle.Fg = ui.Color(theme.disabled)
 		eventList.Title = "Events ●"
 		eventView.Title = "JSON"
 	}
@@ -154,32 +176,32 @@ func Start(config config.Config) {
 	footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 	footer.Border = false
 	footer.WrapText = false
-	footer.TextStyle.Fg = ansi8bit.DarkViolet
-	footer.TextStyle.Bg = ui.ColorWhite
+	footer.TextStyle.Fg = ui.Color(theme.primary)
+	footer.TextStyle.Bg = ui.Color(theme.base)
 
 	version.Text = "Logshark v1.0"
 	version.Border = false
 	version.WrapText = false
-	version.TextStyle.Fg = ansi8bit.DarkViolet
-	version.TextStyle.Bg = ui.ColorWhite
+	version.TextStyle.Fg = ui.Color(theme.primary)
+	version.TextStyle.Bg = ui.Color(theme.base)
 
 	stats.Border = false
 	stats.WrapText = false
-	stats.TextStyle.Fg = ui.ColorWhite
-	stats.TextStyle.Bg = ansi8bit.DarkViolet
+	stats.TextStyle.Fg = ui.Color(theme.base)
+	stats.TextStyle.Bg = ui.Color(theme.primary)
 
 	serverStatus.Text = fmt.Sprintf("%s:%s", config.Host, config.Port)
 	serverStatus.Border = false
 	serverStatus.WrapText = false
-	serverStatus.TextStyle.Fg = ui.ColorWhite
-	serverStatus.TextStyle.Bg = ansi8bit.DarkViolet
+	serverStatus.TextStyle.Fg = ui.Color(theme.base)
+	serverStatus.TextStyle.Bg = ui.Color(theme.primary)
 
 	eventList.Title = "Events ●"
-	eventList.TextStyle = ui.NewStyle(ansi8bit.Yellow1)
+	eventList.TextStyle.Fg = ui.Color(theme.secondary)
 	eventList.WrapText = false
 
-	eventList.BorderStyle.Fg = ansi8bit.White
-	eventView.BorderStyle.Fg = ansi8bit.Grey69
+	eventList.BorderStyle.Fg = ui.Color(theme.base)
+	eventView.BorderStyle.Fg = ui.Color(theme.disabled)
 
 	termWidth, termHeight = ui.TerminalDimensions()
 
