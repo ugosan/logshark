@@ -148,7 +148,7 @@ func Start(config config.Config) {
 
 	formatter.Indent = 2
 
-	theme.SetColors(15, 242, 91, 226, 7, 65, 226, 11)
+	theme.SetColors(15, 242, 91, 226, 190, 92, 12, 54)
 
 	grid := ui.NewGrid()
 
