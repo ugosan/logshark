@@ -83,11 +83,14 @@ func translateANSI(s string) string {
 
 func updateEventView() {
 
-	if eventList.SelectedRow > -1 {
-
-		eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
-
+	logs.Log(eventList.SelectedRow)
+	if len(events) >= 0 {
+		return
 	}
+
+	eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
+
+	ui.Render(eventView)
 
 }
 
@@ -137,8 +140,6 @@ func resize(width int, height int) {
 
 func Start(config config.Config) {
 
-	go server.Start(channel, config)
-
 	if err := ui.Init(); err != nil {
 		logs.Log(err)
 	}
@@ -174,6 +175,7 @@ func Start(config config.Config) {
 
 	focused = eventList
 
+	go server.Start(channel, config)
 	go readEvents()
 
 	uiEvents := ui.PollEvents()
@@ -189,18 +191,20 @@ func Start(config config.Config) {
 				if focused == eventList {
 					eventList.ScrollDown()
 					updateEventView()
+					ui.Render(eventList)
 				} else {
 					eventView.ScrollDown()
+					ui.Render(eventView)
 				}
-				ui.Render(eventList, eventView)
 			case "<Up>":
 				if focused == eventList {
 					eventList.ScrollUp()
 					updateEventView()
+					ui.Render(eventList)
 				} else {
 					eventView.ScrollUp()
+					ui.Render(eventView)
 				}
-				ui.Render(eventList, eventView)
 			case "<Tab>":
 				switchFocus()
 				ui.Render(eventList, eventView)
