@@ -25,6 +25,8 @@ var (
   eventView  = logshark_widgets.NewJSONView()
   footer     = logshark_widgets.NewFooter()
   stats      = logshark_widgets.NewFooter()
+  version    = logshark_widgets.NewFooter()
+  serverStatus = logshark_widgets.NewFooter()
   grid       = ui.NewGrid()
   logs       = logging.GetManager()
 
@@ -59,7 +61,7 @@ func readEvents() {
 func redraw() {
   if redrawFlag {
 
-    ui.Render(eventView, eventList, footer)
+    ui.Render(eventView, eventList, footer, version, serverStatus)
     redrawFlag = false
   }
 }
@@ -108,9 +110,7 @@ func switchFocus() {
 
 func updateStats() {
 
-  statsText := fmt.Sprintf(" [%d](fg:white)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
-
-  stats.Text = statsText
+  stats.Text = fmt.Sprintf(" [%d](fg:white)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
   ui.Render(stats)
 }
 
@@ -126,10 +126,14 @@ func resize(width int, height int) {
     ),
   )
 
-  footer.SetRect(0, height-1, width, height)
-  stats.SetRect(0, height-2, width, height-1)
 
-  ui.Render(grid, stats, footer)
+  stats.SetRect(0, height-2, width-len(serverStatus.Text)-1, height-1)
+  serverStatus.SetRect(width-len(serverStatus.Text)-1, height-2, width, height-1)
+  
+  footer.SetRect(0, height-1, width, height)
+  version.SetRect(width-len(version.Text)-1, height-1, width, height)
+
+  ui.Render(grid, stats, footer, version, serverStatus)
 }
 
 func Start(config config.Config) {
@@ -140,18 +144,34 @@ func Start(config config.Config) {
   defer ui.Close()
 
   formatter.Indent = 2
+
+  grid := ui.NewGrid()
+
   eventView.Title = "JSON"
   eventView.WrapText = true
 
+  footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
   footer.Border = false
   footer.WrapText = false
   footer.TextStyle.Fg = ansi8bit.DarkViolet
   footer.TextStyle.Bg = ui.ColorWhite
 
+  version.Text = "Logshark v1.0"
+  version.Border = false
+  version.WrapText = false
+  version.TextStyle.Fg = ansi8bit.DarkViolet
+  version.TextStyle.Bg = ui.ColorWhite
+
   stats.Border = false
   stats.WrapText = false
   stats.TextStyle.Fg = ui.ColorWhite
   stats.TextStyle.Bg = ansi8bit.DarkViolet
+
+  serverStatus.Text = fmt.Sprintf("%s:%s", config.Host, config.Port)
+  serverStatus.Border = false
+  serverStatus.WrapText = false
+  serverStatus.TextStyle.Fg = ui.ColorWhite
+  serverStatus.TextStyle.Bg = ansi8bit.DarkViolet
 
   eventList.Title = "Events ●"
   eventList.TextStyle = ui.NewStyle(ansi8bit.Yellow1)
@@ -160,12 +180,9 @@ func Start(config config.Config) {
   eventList.BorderStyle.Fg = ansi8bit.White
   eventView.BorderStyle.Fg = ansi8bit.Grey69
 
-  grid := ui.NewGrid()
   termWidth, termHeight = ui.TerminalDimensions()
 
   resize(termWidth, termHeight)
-
-  footer.Text = " [q](fg:yellow)uit [r](fg:yellow)eset"
 
   focused = eventList
 
