@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/TylerBrock/colorjson"
 	ui "github.com/gizak/termui/v3"
@@ -54,7 +55,7 @@ func readEvents() {
 		s, _ := json.Marshal(obj)
 		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
-		ui.Render(eventList)
+		redrawFlag = true
 
 		if len(eventList.Rows) == 1 {
 			eventList.SelectedRow = 0
@@ -65,12 +66,28 @@ func readEvents() {
 
 }
 
+//instead of redrawing at every event, redraws every 300 microseconds
+func redraw() {
+
+	for {
+
+		if redrawFlag {
+
+			ui.Render(eventView, eventList, footer, stats, version, serverStatus)
+			redrawFlag = false
+		}
+
+		time.Sleep(300 * time.Microsecond)
+
+	}
+}
+
 func readStats() {
 
 	for {
 		_stats := <-statsChannel
 		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", _stats.Events, _stats.MaxEvents, _stats.Eps)
-		ui.Render(stats)
+		redrawFlag = true
 	}
 
 }
@@ -151,8 +168,6 @@ func Start(config config.Config) {
 
 	theme.SetColors(15, 242, 91, 226, 190, 125, 12, 54)
 
-	grid := ui.NewGrid()
-
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
@@ -192,8 +207,11 @@ func Start(config config.Config) {
 
 	focused = eventList
 
+	redrawFlag = true
+
 	go readEvents()
 	go readStats()
+	go redraw()
 
 	uiEvents := ui.PollEvents()
 
@@ -234,10 +252,9 @@ func Start(config config.Config) {
 				ui.Render(eventList, eventView)
 			case "r":
 				reset()
-				ui.Render(grid)
+				redrawFlag = true
 			case "t":
 				server.SendTestRequest()
-				ui.Render(grid)
 			case "<Resize>":
 				payload := e.Payload.(ui.Resize)
 
