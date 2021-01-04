@@ -68,17 +68,10 @@ func readEvents() {
 
 //instead of redrawing at every event, redraws every 300 microseconds
 func redraw() {
+	if redrawFlag == true {
 
-	for {
-
-		if redrawFlag {
-
-			ui.Render(eventView, eventList, footer, stats, version, serverStatus)
-			redrawFlag = false
-		}
-
-		time.Sleep(300 * time.Microsecond)
-
+		ui.Render(eventView, eventList, footer, stats, version, serverStatus)
+		redrawFlag = false
 	}
 }
 
@@ -215,6 +208,8 @@ func Start(config config.Config) {
 
 	uiEvents := ui.PollEvents()
 
+	redrawTicker := time.NewTicker(time.Microsecond * 300).C
+
 	for {
 		select {
 		case e := <-uiEvents:
@@ -260,7 +255,10 @@ func Start(config config.Config) {
 
 				resize(payload.Width, payload.Height)
 			}
+		case <-redrawTicker:
+			redraw()
 		}
+
 	}
 
 }
