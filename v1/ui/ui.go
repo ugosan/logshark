@@ -112,7 +112,7 @@ func switchFocus() {
 
 func updateStats() {
 
-	stats.Text = fmt.Sprintf(" [%d](fg:base)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
+	stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
 	ui.Render(stats)
 }
 
@@ -155,7 +155,7 @@ func Start(config config.Config) {
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
-	footer.Text = " [q](fg:primary)uit [r](fg:primary)eset"
+	footer.Text = " <q>(fg:primary)uit <r>(fg:primary)eset"
 	footer.Border = false
 	footer.WrapText = false
 	footer.TextStyle.Fg = theme.GetColorByName("primary")

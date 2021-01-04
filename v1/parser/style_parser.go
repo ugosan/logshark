@@ -4,7 +4,6 @@ import (
 	"strings"
 
 	termui "github.com/gizak/termui/v3"
-	logs "github.com/ugosan/logshark/v1/logging"
 	theme "github.com/ugosan/logshark/v1/theme"
 )
 
@@ -17,7 +16,7 @@ const (
 
 	tokenItemSeparator  = ","
 	tokenValueSeparator = ":"
-
+	//using <> instead of the original [] due to JSON compatibility
 	tokenBeginStyledText = '<'
 	tokenEndStyledText   = '>'
 
@@ -33,6 +32,7 @@ const (
 	parserStateStyledText
 )
 
+
 var modifierMap = map[string]termui.Modifier{
 	"bold":      termui.ModifierBold,
 	"underline": termui.ModifierUnderline,
@@ -43,15 +43,16 @@ var modifierMap = map[string]termui.Modifier{
 func readStyle(runes []rune, defaultStyle termui.Style) termui.Style {
 	style := defaultStyle
 	split := strings.Split(string(runes), tokenItemSeparator)
+
+
 	for _, item := range split {
 		pair := strings.Split(item, tokenValueSeparator)
 		if len(pair) == 2 {
 			switch pair[0] {
 			case tokenFg:
-				style.Fg = theme.GetTheme().GetColorByName(pair[1])
-				logs.GetManager().Log(theme.GetTheme().GetColorByName(pair[1]))
+				style.Fg = theme.GetTheme().StyleParserColorMap[pair[1]]
 			case tokenBg:
-				style.Bg = theme.GetTheme().GetColorByName(pair[1])
+				style.Bg = theme.GetTheme().StyleParserColorMap[pair[1]]
 			case tokenModifier:
 				style.Modifier = modifierMap[pair[1]]
 			}
