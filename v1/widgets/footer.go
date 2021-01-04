@@ -5,6 +5,7 @@ import (
 
 	. "github.com/gizak/termui/v3"
 	"github.com/ugosan/logshark/v1/logging"
+	parser "github.com/ugosan/logshark/v1/parser"
 )
 
 var (
@@ -37,7 +38,7 @@ func (self *Footer) Draw(buf *Buffer) {
 
 	self.Block.Draw(buf)
 
-	cells := ParseStyles(self.Text, self.TextStyle)
+	cells := parser.ParseStyles(self.Text, self.TextStyle)
 
 	runes := []rune(" ")
 

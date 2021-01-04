@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	termui "github.com/gizak/termui/v3"
+	logs "github.com/ugosan/logshark/v1/logging"
 	theme "github.com/ugosan/logshark/v1/theme"
 )
 
@@ -30,7 +31,6 @@ const (
 	parserStateDefault parserState = iota
 	parserStateStyleItems
 	parserStateStyledText
-	ColorDarkRed = 88
 )
 
 var modifierMap = map[string]termui.Modifier{
@@ -49,6 +49,7 @@ func readStyle(runes []rune, defaultStyle termui.Style) termui.Style {
 			switch pair[0] {
 			case tokenFg:
 				style.Fg = theme.GetTheme().GetColorByName(pair[1])
+				logs.GetManager().Log(theme.GetTheme().GetColorByName(pair[1]))
 			case tokenBg:
 				style.Bg = theme.GetTheme().GetColorByName(pair[1])
 			case tokenModifier:
