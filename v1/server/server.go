@@ -24,7 +24,8 @@ type Stats struct {
 var configflags config.Config
 
 var currentStats = Stats{0, 0, 0, 0}
-var channel = make(chan map[string]interface{})
+var eventChannel = make(chan map[string]interface{})
+var statsChannel = make(chan Stats)
 
 func addEvent(jsonBody string) {
 
@@ -33,11 +34,12 @@ func addEvent(jsonBody string) {
 		var obj map[string]interface{}
 		json.Unmarshal([]byte(jsonBody), &obj)
 
-		channel <- obj
+		eventChannel <- obj
 
 	}
 
 	currentStats.Events++
+	statsChannel <- currentStats
 
 }
 
@@ -50,6 +52,7 @@ func updateEps() {
 			currentStats.Eps = currentStats.Events - currentStats.EpsT0
 			currentStats.EpsT0 = currentStats.Events
 			currentStats.MaxEvents = configflags.MaxEvents
+			statsChannel <- currentStats
 		}
 	}
 }
@@ -162,7 +165,7 @@ func ResetStats() Stats {
 	return currentStats
 }
 
-func Start(c chan map[string]interface{}, config config.Config) {
+func Start(_eventChannel chan map[string]interface{}, _statsChannel chan Stats, config config.Config) {
 
 	configflags = config
 
@@ -174,7 +177,8 @@ func Start(c chan map[string]interface{}, config config.Config) {
 	http.HandleFunc("/_bulk", bulk)
 	http.HandleFunc("/_license", license)
 
-	channel = c
+	eventChannel = _eventChannel
+	statsChannel = _statsChannel
 
 	go updateEps()
 

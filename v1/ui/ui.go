@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/TylerBrock/colorjson"
 	ui "github.com/gizak/termui/v3"
@@ -18,7 +17,8 @@ import (
 )
 
 var (
-	channel      = make(chan map[string]interface{})
+	eventChannel = make(chan map[string]interface{})
+	statsChannel = make(chan server.Stats)
 	events       []string
 	redrawFlag   = true
 	eventList    = widgets.NewList()
@@ -46,26 +46,33 @@ var (
 func readEvents() {
 
 	for {
-		obj := <-channel
+		obj := <-eventChannel
 
-		prettyJson, _ := formatter.Marshal(obj)
-		events = append(events, translateANSI(string(prettyJson)))
+		prettyJSON, _ := formatter.Marshal(obj)
+		events = append(events, translateANSI(string(prettyJSON)))
 
 		s, _ := json.Marshal(obj)
 		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
-		redrawFlag = true
+		ui.Render(eventList)
+
+		if len(eventList.Rows) == 1 {
+			eventList.SelectedRow = 0
+			updateEventView()
+		}
+
 	}
 
 }
 
-//instead of redrawing at every event, redraws every 300 microseconds
-func redraw() {
-	if redrawFlag {
+func readStats() {
 
-		ui.Render(eventView, eventList, footer, version, serverStatus)
-		redrawFlag = false
+	for {
+		_stats := <-statsChannel
+		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", _stats.Events, _stats.MaxEvents, _stats.Eps)
+		ui.Render(stats)
 	}
+
 }
 
 func reset() {
@@ -110,12 +117,6 @@ func switchFocus() {
 
 }
 
-func updateStats() {
-
-	stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
-	ui.Render(stats)
-}
-
 func resize(width int, height int) {
 	ui.Clear()
 
@@ -139,7 +140,7 @@ func resize(width int, height int) {
 
 func Start(config config.Config) {
 
-	go server.Start(channel, config)
+	go server.Start(eventChannel, statsChannel, config)
 
 	if err := ui.Init(); err != nil {
 		logs.Log(err)
@@ -148,7 +149,7 @@ func Start(config config.Config) {
 
 	formatter.Indent = 2
 
-	theme.SetColors(15, 242, 91, 226, 190, 92, 12, 54)
+	theme.SetColors(15, 242, 91, 226, 190, 125, 12, 54)
 
 	grid := ui.NewGrid()
 
@@ -192,9 +193,9 @@ func Start(config config.Config) {
 	focused = eventList
 
 	go readEvents()
+	go readStats()
 
 	uiEvents := ui.PollEvents()
-	ticker := time.NewTicker(time.Microsecond * 300).C
 
 	for {
 		select {
@@ -242,15 +243,6 @@ func Start(config config.Config) {
 
 				resize(payload.Width, payload.Height)
 			}
-		case <-ticker:
-			updateStats()
-
-			if len(eventList.Rows) == 1 {
-				eventList.SelectedRow = 0
-				updateEventView()
-			}
-
-			redraw()
 		}
 	}
 
