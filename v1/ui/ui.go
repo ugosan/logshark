@@ -167,7 +167,7 @@ func Start(config config.Config) {
 
 	formatter.Indent = 2
 
-	theme.SetColors(15, 242, 91, 226, 190, 125, 12, 54)
+	t.GetTheme().SetColors(t.ThemeLavender)
 
 	eventView.Title = "JSON"
 	eventView.WrapText = true
