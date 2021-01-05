@@ -18,7 +18,8 @@ import (
 )
 
 var (
-	channel      = make(chan map[string]interface{})
+	eventChannel = make(chan map[string]interface{})
+	statsChannel = make(chan server.Stats)
 	events       []string
 	redrawFlag   = true
 	eventList    = widgets.NewList()
@@ -46,26 +47,42 @@ var (
 func readEvents() {
 
 	for {
-		obj := <-channel
+		obj := <-eventChannel
 
-		prettyJson, _ := formatter.Marshal(obj)
-		events = append(events, translateANSI(string(prettyJson)))
+		prettyJSON, _ := formatter.Marshal(obj)
+		events = append(events, translateANSI(string(prettyJSON)))
 
 		s, _ := json.Marshal(obj)
 		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
 		redrawFlag = true
+
+		if len(eventList.Rows) == 1 {
+			eventList.SelectedRow = 0
+			updateEventView()
+		}
+
 	}
 
 }
 
 //instead of redrawing at every event, redraws every 300 microseconds
 func redraw() {
-	if redrawFlag {
+	if redrawFlag == true {
 
-		ui.Render(eventView, eventList, footer, version, serverStatus)
+		ui.Render(eventView, eventList, footer, stats, version, serverStatus)
 		redrawFlag = false
 	}
+}
+
+func readStats() {
+
+	for {
+		_stats := <-statsChannel
+		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", _stats.Events, _stats.MaxEvents, _stats.Eps)
+		redrawFlag = true
+	}
+
 }
 
 func reset() {
@@ -110,10 +127,12 @@ func switchFocus() {
 
 }
 
-func updateStats() {
+func fold(row int) {
 
-	stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", server.GetStats().Events, server.GetStats().MaxEvents, server.GetStats().Eps)
-	ui.Render(stats)
+	// still have to figure this out, styling messing up
+
+	//eventView.Rows[row] = strings.Split(eventView.Rows[row], "\":")[1] + " {...}"
+	//ui.Render(eventView)
 }
 
 func resize(width int, height int) {
@@ -139,7 +158,7 @@ func resize(width int, height int) {
 
 func Start(config config.Config) {
 
-	go server.Start(channel, config)
+	go server.Start(eventChannel, statsChannel, config)
 
 	if err := ui.Init(); err != nil {
 		logs.Log(err)
@@ -148,9 +167,7 @@ func Start(config config.Config) {
 
 	formatter.Indent = 2
 
-	theme.SetColors(15, 242, 91, 226, 190, 92, 12, 54)
-
-	grid := ui.NewGrid()
+	t.GetTheme().SetColors(t.Lavanda)
 
 	eventView.Title = "JSON"
 	eventView.WrapText = true
@@ -191,10 +208,15 @@ func Start(config config.Config) {
 
 	focused = eventList
 
+	redrawFlag = true
+
 	go readEvents()
+	go readStats()
+	go redraw()
 
 	uiEvents := ui.PollEvents()
-	ticker := time.NewTicker(time.Microsecond * 300).C
+
+	redrawTicker := time.NewTicker(time.Microsecond * 300).C
 
 	for {
 		select {
@@ -231,27 +253,24 @@ func Start(config config.Config) {
 			case "<Tab>":
 				switchFocus()
 				ui.Render(eventList, eventView)
+			case "<Space>":
+				if focused == eventView {
+					fold(eventView.SelectedRow)
+				}
 			case "r":
 				reset()
-				ui.Render(grid)
+				redrawFlag = true
 			case "t":
 				server.SendTestRequest()
-				ui.Render(grid)
 			case "<Resize>":
 				payload := e.Payload.(ui.Resize)
 
 				resize(payload.Width, payload.Height)
 			}
-		case <-ticker:
-			updateStats()
-
-			if len(eventList.Rows) == 1 {
-				eventList.SelectedRow = 0
-				updateEventView()
-			}
-
+		case <-redrawTicker:
 			redraw()
 		}
+
 	}
 
 }

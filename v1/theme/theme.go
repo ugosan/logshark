@@ -6,53 +6,52 @@ import (
 	termui "github.com/gizak/termui/v3"
 )
 
+type ColorScheme struct {
+	base      int
+	disabled  int
+	primary   int
+	secondary int
+	json1     int
+	json2     int
+	json3     int
+	json4     int
+}
+
 //Theme uses xterm colors 1-255
 type Theme struct {
-	base                int
-	disabled            int
-	primary             int
-	secondary           int
-	json1               int
-	json2               int
-	json3               int
-	json4               int
+	colorScheme         ColorScheme
 	StyleParserColorMap map[string]termui.Color
 }
 
 var (
-	theme *Theme
-	once  sync.Once
+	theme   *Theme
+	once    sync.Once
+	Lavanda = ColorScheme{base: 15, disabled: 242, primary: 91, secondary: 226, json1: 190, json2: 125, json3: 12, json4: 54}
 )
 
 func GetTheme() *Theme {
 
 	once.Do(func() {
-		theme = &Theme{1, 1, 1, 1, 1, 1, 1, 1, nil}
+		colorScheme := ColorScheme{}
+		theme = &Theme{colorScheme, nil}
 	})
 
 	return theme
 }
 
-func (t *Theme) SetColors(base int, disabled int, primary int, secondary int, json1 int, json2 int, json3 int, json4 int) {
-	t.base = base
-	t.disabled = disabled
-	t.primary = primary
-	t.secondary = secondary
-	t.json1 = json1
-	t.json2 = json2
-	t.json3 = json3
-	t.json4 = json4
+func (t *Theme) SetColors(scheme ColorScheme) {
+	t.colorScheme = scheme
 
 	t.StyleParserColorMap = map[string]termui.Color{}
 
-	t.StyleParserColorMap["base"] = termui.Color(t.base)
-	t.StyleParserColorMap["disabled"] = termui.Color(t.disabled)
-	t.StyleParserColorMap["primary"] = termui.Color(t.primary)
-	t.StyleParserColorMap["secondary"] = termui.Color(t.secondary)
-	t.StyleParserColorMap["json1"] = termui.Color(t.json1)
-	t.StyleParserColorMap["json2"] = termui.Color(t.json2)
-	t.StyleParserColorMap["json3"] = termui.Color(t.json3)
-	t.StyleParserColorMap["json4"] = termui.Color(t.json4)
+	t.StyleParserColorMap["base"] = termui.Color(t.colorScheme.base)
+	t.StyleParserColorMap["disabled"] = termui.Color(t.colorScheme.disabled)
+	t.StyleParserColorMap["primary"] = termui.Color(t.colorScheme.primary)
+	t.StyleParserColorMap["secondary"] = termui.Color(t.colorScheme.secondary)
+	t.StyleParserColorMap["json1"] = termui.Color(t.colorScheme.json1)
+	t.StyleParserColorMap["json2"] = termui.Color(t.colorScheme.json2)
+	t.StyleParserColorMap["json3"] = termui.Color(t.colorScheme.json3)
+	t.StyleParserColorMap["json4"] = termui.Color(t.colorScheme.json4)
 }
 
 func (t *Theme) GetColorByName(name string) termui.Color {
