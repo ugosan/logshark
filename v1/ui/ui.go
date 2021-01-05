@@ -127,6 +127,14 @@ func switchFocus() {
 
 }
 
+func fold(row int) {
+
+	// still have to figure this out, styling messing up
+
+	//eventView.Rows[row] = strings.Split(eventView.Rows[row], "\":")[1] + " {...}"
+	//ui.Render(eventView)
+}
+
 func resize(width int, height int) {
 	ui.Clear()
 
@@ -245,6 +253,10 @@ func Start(config config.Config) {
 			case "<Tab>":
 				switchFocus()
 				ui.Render(eventList, eventView)
+			case "<Space>":
+				if focused == eventView {
+					fold(eventView.SelectedRow)
+				}
 			case "r":
 				reset()
 				redrawFlag = true
