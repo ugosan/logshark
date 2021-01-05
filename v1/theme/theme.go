@@ -24,9 +24,9 @@ type Theme struct {
 }
 
 var (
-	theme    *Theme
-	once     sync.Once
-	Lavender = ColorScheme{base: 15, disabled: 242, primary: 91, secondary: 226, json1: 190, json2: 125, json3: 12, json4: 54}
+	theme   *Theme
+	once    sync.Once
+	Lavanda = ColorScheme{base: 15, disabled: 242, primary: 91, secondary: 226, json1: 190, json2: 125, json3: 12, json4: 54}
 )
 
 func GetTheme() *Theme {
