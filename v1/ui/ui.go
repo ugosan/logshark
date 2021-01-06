@@ -172,7 +172,7 @@ func Start(config config.Config) {
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
-	footer.Text = " <q>(fg:primary)uit <r>(fg:primary)eset"
+	footer.Text = " <q>(fg:disabled)uit <r>(fg:disabled)eset"
 	footer.Border = false
 	footer.WrapText = false
 	footer.TextStyle.Fg = theme.GetColorByName("primary")
