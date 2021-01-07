@@ -21,11 +21,13 @@ type Stats struct {
 	MaxEvents int
 }
 
-var configflags config.Config
+var (
+	configflags config.Config
 
-var currentStats = Stats{0, 0, 0, 0}
-var eventChannel = make(chan map[string]interface{})
-var statsChannel = make(chan Stats)
+	currentStats = Stats{0, 0, 0, 0}
+	eventChannel = make(chan map[string]interface{})
+	statsChannel = make(chan Stats)
+)
 
 func addEvent(jsonBody string) {
 
