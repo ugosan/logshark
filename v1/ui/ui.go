@@ -30,6 +30,7 @@ var (
 	serverStatus = logshark_widgets.NewFooter()
 	grid         = ui.NewGrid()
 	logs         = logging.GetManager()
+	configflags  config.Config
 
 	keysRegex, _    = regexp.Compile(`(\[37m)(.*?)(\[0m)`)
 	stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
@@ -79,7 +80,8 @@ func readStats() {
 
 	for {
 		_stats := <-statsChannel
-		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events %d e/s ", _stats.Events, _stats.MaxEvents, _stats.Eps)
+		//eventList.Title = fmt.Sprintf(" %d/%d ", _stats.Events, _stats.MaxEvents)
+		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events  %d eps  %db avg", _stats.Events, _stats.MaxEvents, _stats.Eps, _stats.AvgBytes)
 		redrawFlag = true
 	}
 
@@ -105,6 +107,10 @@ func translateANSI(s string) string {
 func updateEventView() {
 
 	eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
+
+	eventView.Rows = append(eventView.Rows, "")
+	eventView.Rows = append(eventView.Rows, "")
+	eventView.Rows = append(eventView.Rows, "")
 
 	ui.Render(eventView)
 }
@@ -140,12 +146,24 @@ func resize(width int, height int) {
 
 	grid.SetRect(0, 0, width, height-2)
 
-	grid.Set(
-		ui.NewRow(1,
-			ui.NewCol(0.2, eventList),
-			ui.NewCol(0.8, eventView),
-		),
-	)
+	if configflags.Layout == "vertical" {
+
+		grid.Set(
+			ui.NewRow(0.3,
+				ui.NewCol(1, eventList),
+			),
+			ui.NewRow(0.7,
+				ui.NewCol(1, eventView),
+			),
+		)
+	} else {
+		grid.Set(
+			ui.NewRow(1,
+				ui.NewCol(0.2, eventList),
+				ui.NewCol(0.8, eventView),
+			),
+		)
+	}
 
 	stats.SetRect(0, height-2, width-len(serverStatus.Text)-1, height-1)
 	serverStatus.SetRect(width-len(serverStatus.Text)-1, height-2, width, height-1)
@@ -156,9 +174,11 @@ func resize(width int, height int) {
 	ui.Render(grid, stats, footer, version, serverStatus)
 }
 
-func Start(config config.Config) {
+func Start(_config config.Config) {
 
-	go server.Start(eventChannel, statsChannel, config)
+	configflags = _config
+
+	go server.Start(eventChannel, statsChannel, _config)
 
 	if err := ui.Init(); err != nil {
 		logs.Log(err)
@@ -189,7 +209,7 @@ func Start(config config.Config) {
 	stats.TextStyle.Fg = theme.GetColorByName("base")
 	stats.TextStyle.Bg = theme.GetColorByName("primary")
 
-	serverStatus.Text = fmt.Sprintf("%s:%s", config.Host, config.Port)
+	serverStatus.Text = fmt.Sprintf("%s:%s", configflags.Host, configflags.Port)
 	serverStatus.Border = false
 	serverStatus.WrapText = false
 	serverStatus.TextStyle.Fg = theme.GetColorByName("base")
