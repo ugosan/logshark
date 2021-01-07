@@ -80,6 +80,7 @@ func readStats() {
 
 	for {
 		_stats := <-statsChannel
+		//eventList.Title = fmt.Sprintf(" %d/%d ", _stats.Events, _stats.MaxEvents)
 		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events  %d eps  %db avg", _stats.Events, _stats.MaxEvents, _stats.Eps, _stats.AvgBytes)
 		redrawFlag = true
 	}
