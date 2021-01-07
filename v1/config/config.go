@@ -5,4 +5,5 @@ type Config struct {
 	Port      string
 	MaxEvents int
 	LogFile   string
+	Layout    string
 }
