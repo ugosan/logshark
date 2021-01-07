@@ -19,12 +19,13 @@ type Stats struct {
 	EpsT0     int
 	Eps       int
 	MaxEvents int
+	AvgBytes  int
 }
 
 var (
 	configflags config.Config
 
-	currentStats = Stats{0, 0, 0, 0}
+	currentStats = Stats{0, 0, 0, 0, 0}
 	eventChannel = make(chan map[string]interface{})
 	statsChannel = make(chan Stats)
 )
@@ -40,8 +41,13 @@ func addEvent(jsonBody string) {
 
 	}
 
+	//currentStats.AvgBytes = (currentStats.AvgBytes + cap([]byte(jsonBody))) / currentStats.Events
+
 	currentStats.Events++
+	currentStats.AvgBytes = int((cap([]byte(jsonBody)) + currentStats.AvgBytes) / currentStats.Events)
 	statsChannel <- currentStats
+
+	logging.GetManager().Log(currentStats)
 
 }
 
@@ -153,6 +159,7 @@ func SendTestRequest() {
 		bytes.NewBuffer([]byte(testJSON)))
 	if err != nil {
 		print(err)
+		logging.GetManager().Log(err)
 	}
 
 	defer resp.Body.Close()
@@ -163,7 +170,7 @@ func GetStats() Stats {
 }
 
 func ResetStats() Stats {
-	currentStats = Stats{0, 0, 0, configflags.MaxEvents}
+	currentStats = Stats{0, 0, 0, configflags.MaxEvents, 0}
 	return currentStats
 }
 
