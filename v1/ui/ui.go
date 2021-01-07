@@ -106,6 +106,10 @@ func updateEventView() {
 
 	eventView.Rows = strings.Split(events[eventList.SelectedRow], "\n")
 
+	eventView.Rows = append(eventView.Rows, "")
+	eventView.Rows = append(eventView.Rows, "")
+	eventView.Rows = append(eventView.Rows, "")
+
 	ui.Render(eventView)
 }
 
