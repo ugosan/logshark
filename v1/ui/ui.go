@@ -80,8 +80,8 @@ func readStats() {
 
 	for {
 		_stats := <-statsChannel
-		//eventList.Title = fmt.Sprintf(" %d/%d ", _stats.Events, _stats.MaxEvents)
-		stats.Text = fmt.Sprintf(" <%d>(fg:base)/%d events  %d eps  %db avg", _stats.Events, _stats.MaxEvents, _stats.Eps, _stats.AvgBytes)
+		eventList.Title = fmt.Sprintf("%d/%d", _stats.Events, _stats.MaxEvents)
+		stats.Text = fmt.Sprintf(" %d eps  %db avg", _stats.Eps, _stats.AvgBytes)
 		redrawFlag = true
 	}
 
@@ -120,15 +120,15 @@ func switchFocus() {
 	if focused == eventList {
 		focused = eventView
 		eventList.BorderStyle.Fg = theme.GetColorByName("disabled")
-		eventView.BorderStyle.Fg = theme.GetColorByName("base")
-		eventList.Title = "Events"
-		eventView.Title = "JSON ●"
+    eventView.BorderStyle.Fg = theme.GetColorByName("base")
+    eventList.TitleStyle.Fg = theme.GetColorByName("disabled")
+    eventView.TitleStyle.Fg = theme.GetColorByName("base")
 	} else {
 		focused = eventList
 		eventList.BorderStyle.Fg = theme.GetColorByName("base")
-		eventView.BorderStyle.Fg = theme.GetColorByName("disabled")
-		eventList.Title = "Events ●"
-		eventView.Title = "JSON"
+    eventView.BorderStyle.Fg = theme.GetColorByName("disabled")
+    eventList.TitleStyle.Fg = theme.GetColorByName("base")
+		eventView.TitleStyle.Fg = theme.GetColorByName("disabled")
 	}
 
 }
@@ -215,7 +215,6 @@ func Start(_config config.Config) {
 	serverStatus.TextStyle.Fg = theme.GetColorByName("base")
 	serverStatus.TextStyle.Bg = theme.GetColorByName("primary")
 
-	eventList.Title = "Events ●"
 	eventList.TextStyle.Fg = theme.GetColorByName("secondary")
 	eventList.WrapText = false
 
