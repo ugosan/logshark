@@ -49,6 +49,17 @@ var (
 		json3:     6,
 		json4:     5,
 	}
+	Mono = ColorScheme{
+		id:        "mono",
+		base:      15, //white
+		disabled:  8,
+		primary:   234,
+		secondary: 252,
+		json1:     243,
+		json2:     243,
+		json3:     243,
+		json4:     243,
+	}
 	themes map[string]ColorScheme
 )
 
@@ -58,6 +69,7 @@ func GetManager() *Theme {
 		themes = make(map[string]ColorScheme)
 		themes[MarromBombom.id] = MarromBombom
 		themes[Lavanda.id] = Lavanda
+		themes[Mono.id] = Mono
 		colorScheme := ColorScheme{}
 		theme = &Theme{colorScheme, nil}
 	})
