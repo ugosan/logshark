@@ -52,7 +52,7 @@ var (
 	Mono = ColorScheme{
 		id:        "mono",
 		base:      15, //white
-		disabled:  8,
+		disabled:  235,
 		primary:   234,
 		secondary: 252,
 		json1:     243,
