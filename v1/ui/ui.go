@@ -191,7 +191,7 @@ func Start(_config config.Config) {
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
-	footer.Text = " <q>(fg:disabled)uit <r>(fg:disabled)eset"
+	footer.Text = " <q>(fg:disabled)uit <r>(fg:disabled)eset <l>(fg:disabled)ayout "
 	footer.Border = false
 	footer.WrapText = false
 	footer.TextStyle.Fg = theme.GetColorByName("primary")
@@ -278,7 +278,7 @@ func Start(_config config.Config) {
 			case "r":
 				reset()
 				redrawFlag = true
-			case "v":
+			case "l":
 				if configflags.Layout == "horizontal" {
 					configflags.Layout = "vertical"
 				} else {
