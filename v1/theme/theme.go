@@ -7,6 +7,7 @@ import (
 )
 
 type ColorScheme struct {
+	id        string
 	base      int
 	disabled  int
 	primary   int
@@ -27,30 +28,36 @@ var (
 	theme   *Theme
 	once    sync.Once
 	Lavanda = ColorScheme{
-		base: 15, //white
-		disabled: 242, //gray
-		primary: 91, 
-		secondary: 226, 
-		json1: 190, 
-		json2: 125, 
-		json3: 12, 
-		json4: 54,
+		id:        "lavanda",
+		base:      15,  //white
+		disabled:  242, //gray
+		primary:   91,
+		secondary: 226,
+		json1:     190,
+		json2:     125,
+		json3:     12,
+		json4:     54,
 	}
 	MarromBombom = ColorScheme{
-		base: 15, //white
-		disabled: 242, //gray
-		primary: 236, 
-		secondary: 137, 
-		json1: 3, 
-		json2: 3, 
-		json3: 6, 
-		json4: 5,
+		id:        "marrombombom",
+		base:      15,  //white
+		disabled:  242, //gray
+		primary:   236,
+		secondary: 137,
+		json1:     3,
+		json2:     3,
+		json3:     6,
+		json4:     5,
 	}
+	themes map[string]ColorScheme
 )
 
-func GetTheme() *Theme {
+func GetManager() *Theme {
 
 	once.Do(func() {
+		themes = make(map[string]ColorScheme)
+		themes[MarromBombom.id] = MarromBombom
+		themes[Lavanda.id] = Lavanda
 		colorScheme := ColorScheme{}
 		theme = &Theme{colorScheme, nil}
 	})
@@ -71,6 +78,10 @@ func (t *Theme) SetColors(scheme ColorScheme) {
 	t.StyleParserColorMap["json2"] = termui.Color(t.colorScheme.json2)
 	t.StyleParserColorMap["json3"] = termui.Color(t.colorScheme.json3)
 	t.StyleParserColorMap["json4"] = termui.Color(t.colorScheme.json4)
+}
+
+func (t *Theme) SetTheme(name string) {
+	t.SetColors(themes[name])
 }
 
 func (t *Theme) GetColorByName(name string) termui.Color {

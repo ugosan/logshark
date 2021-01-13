@@ -7,7 +7,7 @@ import (
 	theme "github.com/ugosan/logshark/v1/theme"
 )
 
-var t = theme.GetTheme()
+var t = theme.GetManager()
 
 const (
 	tokenFg       = "fg"
@@ -32,7 +32,6 @@ const (
 	parserStateStyledText
 )
 
-
 var modifierMap = map[string]termui.Modifier{
 	"bold":      termui.ModifierBold,
 	"underline": termui.ModifierUnderline,
@@ -44,15 +43,14 @@ func readStyle(runes []rune, defaultStyle termui.Style) termui.Style {
 	style := defaultStyle
 	split := strings.Split(string(runes), tokenItemSeparator)
 
-
 	for _, item := range split {
 		pair := strings.Split(item, tokenValueSeparator)
 		if len(pair) == 2 {
 			switch pair[0] {
 			case tokenFg:
-				style.Fg = theme.GetTheme().StyleParserColorMap[pair[1]]
+				style.Fg = t.StyleParserColorMap[pair[1]]
 			case tokenBg:
-				style.Bg = theme.GetTheme().StyleParserColorMap[pair[1]]
+				style.Bg = t.StyleParserColorMap[pair[1]]
 			case tokenModifier:
 				style.Modifier = modifierMap[pair[1]]
 			}

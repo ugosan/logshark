@@ -40,7 +40,7 @@ var (
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
 
-	theme = t.GetTheme()
+	theme = t.GetManager()
 
 	focused interface{}
 )
@@ -187,8 +187,7 @@ func Start(_config config.Config) {
 
 	formatter.Indent = 2
 
-	t.GetTheme().SetColors(t.Lavanda)
-
+	t.GetManager().SetTheme("marrombombom")
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
