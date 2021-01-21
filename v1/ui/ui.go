@@ -40,7 +40,7 @@ var (
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
 
-	theme = t.GetTheme()
+	theme = t.GetManager()
 
 	focused interface{}
 )
@@ -81,7 +81,7 @@ func readStats() {
 	for {
 		_stats := <-statsChannel
 		eventList.Title = fmt.Sprintf("%d/%d", _stats.Events, _stats.MaxEvents)
-		stats.Text = fmt.Sprintf(" %d eps  %db avg", _stats.Eps, _stats.AvgBytes)
+		stats.Text = fmt.Sprintf(" <%d>(fg:secondary) eps <%db>(fg:secondary) avg", _stats.Eps, _stats.AvgBytes)
 		redrawFlag = true
 	}
 
@@ -120,14 +120,14 @@ func switchFocus() {
 	if focused == eventList {
 		focused = eventView
 		eventList.BorderStyle.Fg = theme.GetColorByName("disabled")
-    eventView.BorderStyle.Fg = theme.GetColorByName("base")
-    eventList.TitleStyle.Fg = theme.GetColorByName("disabled")
-    eventView.TitleStyle.Fg = theme.GetColorByName("base")
+		eventView.BorderStyle.Fg = theme.GetColorByName("base")
+		eventList.TitleStyle.Fg = theme.GetColorByName("disabled")
+		eventView.TitleStyle.Fg = theme.GetColorByName("base")
 	} else {
 		focused = eventList
 		eventList.BorderStyle.Fg = theme.GetColorByName("base")
-    eventView.BorderStyle.Fg = theme.GetColorByName("disabled")
-    eventList.TitleStyle.Fg = theme.GetColorByName("base")
+		eventView.BorderStyle.Fg = theme.GetColorByName("disabled")
+		eventList.TitleStyle.Fg = theme.GetColorByName("base")
 		eventView.TitleStyle.Fg = theme.GetColorByName("disabled")
 	}
 
@@ -187,12 +187,11 @@ func Start(_config config.Config) {
 
 	formatter.Indent = 2
 
-	t.GetTheme().SetColors(t.Lavanda)
-
+	t.GetManager().SetTheme("marrombombom")
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
-	footer.Text = " <q>(fg:disabled)uit <r>(fg:disabled)eset"
+	footer.Text = " <q>(fg:disabled)uit <r>(fg:disabled)eset <l>(fg:disabled)ayout "
 	footer.Border = false
 	footer.WrapText = false
 	footer.TextStyle.Fg = theme.GetColorByName("primary")
@@ -278,6 +277,14 @@ func Start(_config config.Config) {
 				}
 			case "r":
 				reset()
+				redrawFlag = true
+			case "l":
+				if configflags.Layout == "horizontal" {
+					configflags.Layout = "vertical"
+				} else {
+					configflags.Layout = "horizontal"
+				}
+				resize(termWidth, termHeight)
 				redrawFlag = true
 			case "t":
 				server.SendTestRequest()
