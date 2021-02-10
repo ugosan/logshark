@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -27,18 +26,16 @@ var (
 	configflags config.Config
 
 	currentStats = Stats{0, 0, 0, 0, 0, 0}
-	eventChannel = make(chan map[string]interface{})
+	eventChannel = make(chan string)
 	statsChannel = make(chan Stats)
+	logs         = logging.GetManager()
 )
 
 func addEvent(jsonBody string) {
 
 	if currentStats.Events < configflags.MaxEvents {
 
-		var obj map[string]interface{}
-		json.Unmarshal([]byte(jsonBody), &obj)
-
-		eventChannel <- obj
+		eventChannel <- jsonBody
 
 	}
 
@@ -46,8 +43,6 @@ func addEvent(jsonBody string) {
 	currentStats.TotalBytes += cap([]byte(jsonBody))
 	currentStats.AvgBytes = currentStats.TotalBytes / currentStats.Events
 	statsChannel <- currentStats
-
-	logging.GetManager().Log(currentStats)
 
 }
 
@@ -102,7 +97,6 @@ func license(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		fmt.Fprintf(w, "{\"license\":{\"status\":\"active\",\"uid\":\"12a6eab7-f0b0-4375-a2eb-8319b9ecd9c3\",\"type\":\"basic\",\"issue_date\":\"2021-01-02T13:52:43.627Z\",\"issue_date_in_millis\":1609595563627,\"max_nodes\":1000,\"issued_to\":\"docker-cluster\",\"issuer\":\"elasticsearch\",\"start_date_in_millis\":-1}}")
 	case "POST":
-
 		addEvent(string(body))
 
 	default:
@@ -151,7 +145,7 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 // Sends a test POST request
 func SendTestRequest() {
 
-	var testJSON = fmt.Sprintf("{	\"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1, \"string\": \"stringsss\", \"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}, \"name\" : \"instance-000000001\",	\"cluster_name\" : \"dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\", \"test\": \" <>()weird \\\"aaa\\\": 1 \"}", currentStats.Events)
+	var testJSON = fmt.Sprintf("{	\"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1, \"string\": \"stringsss\", \"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}, \"name\" : \"instance-000000001\",	\"cluster_name\" : \"<dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"tagline\" : \"You Know, for Search\", \"test\": \" <19> ()weird \\\"aaa\\\": 1 \"}", currentStats.Events)
 
 	resp, err := http.Post(
 		fmt.Sprintf("http://%s:%s", configflags.Host, configflags.Port),
@@ -174,7 +168,7 @@ func ResetStats() Stats {
 	return currentStats
 }
 
-func Start(_eventChannel chan map[string]interface{}, _statsChannel chan Stats, config config.Config) {
+func Start(_eventChannel chan string, _statsChannel chan Stats, config config.Config) {
 
 	configflags = config
 

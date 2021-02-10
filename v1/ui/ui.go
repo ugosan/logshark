@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	eventChannel = make(chan map[string]interface{})
+	eventChannel = make(chan string)
 	statsChannel = make(chan server.Stats)
 	events       []string
 	redrawFlag   = true
@@ -48,13 +48,17 @@ var (
 func readEvents() {
 
 	for {
-		obj := <-eventChannel
+		jsonBody := <-eventChannel
+
+		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), jsonBody))
+
+		var obj map[string]interface{}
+		json.Unmarshal([]byte(jsonBody), &obj)
 
 		prettyJSON, _ := formatter.Marshal(obj)
+		
 		events = append(events, translateANSI(string(prettyJSON)))
 
-		s, _ := json.Marshal(obj)
-		eventList.Rows = append(eventList.Rows, fmt.Sprintf("%d %s", len(events), string(s)))
 
 		redrawFlag = true
 
@@ -187,7 +191,7 @@ func Start(_config config.Config) {
 
 	formatter.Indent = 2
 
-	t.GetManager().SetTheme("marrombombom")
+	t.GetManager().SetTheme("lavanda")
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 
