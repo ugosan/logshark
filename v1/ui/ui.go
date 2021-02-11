@@ -57,8 +57,10 @@ func readEvents() {
 
 		prettyJSON, _ := formatter.Marshal(obj)
 		
-		events = append(events, translateANSI(string(prettyJSON)))
+		var coloredJSON = translateANSI(string(prettyJSON))
+		var escapedJSON = escapeHTML(coloredJSON)
 
+		events = append(events, escapedJSON)
 
 		redrawFlag = true
 
@@ -71,7 +73,7 @@ func readEvents() {
 
 }
 
-//instead of redrawing at every event, redraws every 300 microseconds
+//instead of redrawing at every event, redraws every N microseconds
 func redraw() {
 	if redrawFlag == true {
 
@@ -104,6 +106,15 @@ func translateANSI(s string) string {
 	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:json2)")
 	s = keysRegex.ReplaceAllString(s, "<$2>(fg:json3)")
 	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:json4)")
+
+	return s
+}
+
+//replacing < by ᐸ since the json encoder escapes HTML/XML characters
+func escapeHTML(s string) string {
+
+	s = strings.Replace(s, "\\u003c", "ᐸ", -1)
+	s = strings.Replace(s, "\\u003e", "ᐳ", -1)
 
 	return s
 }
