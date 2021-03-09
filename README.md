@@ -17,6 +17,6 @@ Features:
 
 ## How to use
 
-```bash
+```perl
 ./logshark --host 127.0.0.1 --port 9200 --max 1000
 ```
