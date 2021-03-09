@@ -2,6 +2,9 @@
 
 Logshark is a debugger for JSON logs.
 
+<kbd>![](./_doc/demo.gif)</kbd>
+
+
 
 Features:
 - Terminal UI 

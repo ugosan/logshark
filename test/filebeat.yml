@@ -3,6 +3,8 @@ filebeat.inputs:
   paths:
     - /var/log/*.log
 
+logging.level: debug
+filebeat.registry.path: registry
 
 output.elasticsearch:
   hosts: ["http://127.0.0.1:8080"]
