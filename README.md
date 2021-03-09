@@ -10,7 +10,7 @@ Features:
 - Terminal UI 
 - Navigable list of logs 
 - Highlightable, pretty printed JSON
-- <span style="color:red">C</span><span style="color:orange">o</span><span style="color:yellow">l</span><span style="color:green">o</span><span style="color:blue">r</span><span style="color:cyan">f</span><span style="color:magenta">u</span><span style="color:red">l</span>
+- 🎨 Colorful
 - Beats/Logstash integration
 - Stats such as *Events per second* and *Average size* in bytes per event - useful for calculating bulk/batch size
 
