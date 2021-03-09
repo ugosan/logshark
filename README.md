@@ -14,6 +14,9 @@ Features:
 - Beats/Logstash integration
 - Stats such as *Events per second* and *Average size* in bytes per event - useful for calculating bulk/batch size
 
+## Download
+
+Latest Release [here](/ugosan/logshark/releases/latest/download/logshark)
 
 ## How to use
 
