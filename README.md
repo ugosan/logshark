@@ -16,7 +16,7 @@ Features:
 
 ## Download
 
-Latest Release [here](/ugosan/logshark/releases/latest/download/logshark)
+Beta Release [here](https://github.com/ugosan/logshark/releases/tag/0.1)
 
 ## How to use
 
