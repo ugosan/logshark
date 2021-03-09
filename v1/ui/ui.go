@@ -212,7 +212,7 @@ func Start(_config config.Config) {
 	footer.TextStyle.Fg = theme.GetColorByName("primary")
 	footer.TextStyle.Bg = theme.GetColorByName("base")
 
-	version.Text = "Logshark v1.0"
+	version.Text = "Logshark v0.1"
 	version.Border = false
 	version.WrapText = false
 	version.TextStyle.Fg = theme.GetColorByName("primary")
