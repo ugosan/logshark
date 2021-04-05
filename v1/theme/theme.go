@@ -16,6 +16,7 @@ type ColorScheme struct {
 	json2     int
 	json3     int
 	json4     int
+	json5     int
 }
 
 //Theme uses xterm colors 1-255
@@ -37,6 +38,7 @@ var (
 		json2:     125,
 		json3:     12,
 		json4:     54,
+		json5:     91,
 	}
 	MarromBombom = ColorScheme{
 		id:        "marrombombom",
@@ -48,6 +50,7 @@ var (
 		json2:     3,
 		json3:     6,
 		json4:     5,
+		json5:     236,
 	}
 	Mono = ColorScheme{
 		id:        "mono",
@@ -59,6 +62,8 @@ var (
 		json2:     243,
 		json3:     243,
 		json4:     243,
+		json5:     252,
+		
 	}
 	themes map[string]ColorScheme
 )
@@ -90,6 +95,7 @@ func (t *Theme) SetColors(scheme ColorScheme) {
 	t.StyleParserColorMap["json2"] = termui.Color(t.colorScheme.json2)
 	t.StyleParserColorMap["json3"] = termui.Color(t.colorScheme.json3)
 	t.StyleParserColorMap["json4"] = termui.Color(t.colorScheme.json4)
+	t.StyleParserColorMap["json5"] = termui.Color(t.colorScheme.json5)
 }
 
 func (t *Theme) SetTheme(name string) {

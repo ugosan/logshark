@@ -36,6 +36,7 @@ var (
 	stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
 	numbersRegex, _ = regexp.Compile(`(\[36m)(.*?)(\[0m)`)
 	booleanRegex, _ = regexp.Compile(`(\[33m)(.*?)(\[0m)`)
+	nullRegex, _ 		= regexp.Compile(`(\[35m)(.*?)(\[0m)`)
 	termWidth       = 0
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
@@ -106,6 +107,7 @@ func translateANSI(s string) string {
 	s = numbersRegex.ReplaceAllString(s, "<$2>(fg:json2)")
 	s = keysRegex.ReplaceAllString(s, "<$2>(fg:json3)")
 	s = booleanRegex.ReplaceAllString(s, "<$2>(fg:json4)")
+	s = nullRegex.ReplaceAllString(s, "<$2>(fg:json5)")
 
 	return s
 }
