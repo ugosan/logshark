@@ -6,7 +6,15 @@ import (
 	"github.com/ugosan/logshark/v1/ui"
 
 	"flag"
+	"fmt"
+	"os/exec"
 )
+
+func resetTTY() {
+	cmd := exec.Command("reset")
+	_ = cmd.Run()
+	fmt.Println()
+}
 
 func main() {
 
@@ -23,6 +31,8 @@ func main() {
 	logs := logging.GetManager()
 	logs.InitLogger(config)
 	logs.Log(config)
+
+	defer resetTTY()
 
 	ui.Start(config)
 }

@@ -9,6 +9,7 @@ import (
 
 	"github.com/TylerBrock/colorjson"
 	ui "github.com/gizak/termui/v3"
+	tb "github.com/nsf/termbox-go"
 	"github.com/gizak/termui/v3/widgets"
 	"github.com/ugosan/logshark/v1/config"
 	"github.com/ugosan/logshark/v1/logging"
@@ -201,6 +202,7 @@ func Start(_config config.Config) {
 		logs.Log(err)
 	}
 	defer ui.Close()
+	tb.SetInputMode(tb.InputEsc)
 
 	formatter.Indent = 2
 

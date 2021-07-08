@@ -1,5 +1,9 @@
-FROM scratch
+FROM busybox:1.33
 
-ADD logshark /logshark
+ENV TERM "xterm-256color"
 
-CMD ["/logshark"]
+ADD logshark /usr/local/bin/logshark
+
+
+ENTRYPOINT ["logshark"]
+
