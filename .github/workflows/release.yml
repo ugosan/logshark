@@ -6,7 +6,7 @@ on:
     - 'v*'
 
 jobs:
-  docker:
+  release_logshark:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -33,7 +33,7 @@ jobs:
           prerelease: false
       
       - name: gzip mac
-        run: tar -cvzf dist/logshark-darwin-amd64.tar.gz ./dist/logshark-darwin-amd64
+        run: tar -cvzf logshark-darwin-amd64.tar.gz ./dist/logshark-darwin-amd64
 
       - name: Upload Release Asset Mac
         id: upload-release-asset-mac
@@ -42,12 +42,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/logshark-darwin-amd64.tar.gz
+          asset_path: logshark-darwin-amd64.tar.gz
           asset_name: logshark-darwin-amd64.tar.gz
           asset_content_type: application/gzip
       
       - name: gzip linux
-        run: tar -cvzf dist/logshark-linux-amd64.tar.gz ./dist/logshark-linux-amd64
+        run: tar -cvzf logshark-linux-amd64.tar.gz ./dist/logshark-linux-amd64
       - 
         name: Upload Release Asset Linux
         id: upload-release-asset-linux
@@ -56,12 +56,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ./dist/logshark-linux-amd64.tar.gz
+          asset_path: logshark-linux-amd64.tar.gz
           asset_name: logshark-linux-amd64.tar.gz
           asset_content_type: application/gzip
       
       - name: gzip win
-        run: tar -cvzf dist/logshark-windows-amd64.exe ./dist/logshark-windows-amd64.tar.gz
+        run: tar -cvzf logshark-windows-amd64.exe ./dist/logshark-windows-amd64.tar.gz
 
       - 
         name: Upload Release Asset Windows
@@ -71,7 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/logshark-windows-amd64.tar.gz
+          asset_path: logshark-windows-amd64.tar.gz
           asset_name: logshark-windows-amd64.tar.gz
           asset_content_type: application/gzip
 
