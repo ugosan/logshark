@@ -33,7 +33,7 @@ jobs:
           prerelease: false
       - 
         name: Upload Release Asset Apple Silicon
-        id: upload-release-asset1
+        id: upload-release-asset-m1
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -45,7 +45,7 @@ jobs:
 
       - 
         name: Upload Release Asset Darwin
-        id: upload-release-asset1
+        id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,7 +57,7 @@ jobs:
 
       - 
         name: Upload Release Asset Linux
-        id: upload-release-asset2
+        id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,7 +69,7 @@ jobs:
 
       - 
         name: Upload Release Asset Windows
-        id: upload-release-asset3
+        id: upload-release-asset-win
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
