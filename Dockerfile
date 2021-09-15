@@ -1,9 +1,9 @@
-FROM busybox:1.33
+FROM progrium/busybox
+RUN opkg-install bash
 
 ENV TERM "xterm-256color"
 
-ADD logshark /usr/local/bin/logshark
-
+ADD dist/logshark-darwin-amd64 /usr/local/bin/logshark
 
 ENTRYPOINT ["logshark"]
 
