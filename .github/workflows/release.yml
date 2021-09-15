@@ -61,7 +61,7 @@ jobs:
           asset_content_type: application/gzip
       
       - name: gzip win
-        run: tar -cvzf logshark-windows-amd64.exe ./dist/logshark-windows-amd64.tar.gz
+        run: tar -cvzf logshark-windows-amd64.tar.gz ./dist/logshark-windows-amd64.exe
 
       - 
         name: Upload Release Asset Windows
