@@ -1,0 +1,9 @@
+version: "3.2"
+services:
+  
+  logshark:
+    build: .
+    tty: true
+    stdin_open: true
+    ports:
+      - 8080:8080
