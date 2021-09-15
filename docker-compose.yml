@@ -1,8 +1,9 @@
 version: "3.2"
 services:
   
+  #note you should not use "docker-compose up" but instead "docker-compose run logshark sh" since docker-compose doesnt attach to containers with "up". 
   logshark:
-    build: .
+    image: ugosan/logshark
     tty: true
     stdin_open: true
     ports:
