@@ -18,7 +18,7 @@ jobs:
             platforms: 'linux/amd64, darwin/amd64, windows/amd64'
             package: 'cmd'
             name: 'logshark'
-            compress: 'true'
+            compress: 'false'
             dest: 'dist'
 
       - name: Create Release
@@ -31,10 +31,11 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+      
+      - name: gzip mac
+        run: tar -cvzf dist/logshark-darwin-amd64.tar.gz ./dist/logshark-darwin-amd64
 
-
-      - 
-        name: Upload Release Asset Darwin
+      - name: Upload Release Asset Mac
         id: upload-release-asset-mac
         uses: actions/upload-release-asset@v1
         env:
@@ -44,7 +45,9 @@ jobs:
           asset_path: ./dist/logshark-darwin-amd64.tar.gz
           asset_name: logshark-darwin-amd64.tar.gz
           asset_content_type: application/gzip
-
+      
+      - name: gzip linux
+        run: tar -cvzf dist/logshark-linux-amd64.tar.gz ./dist/logshark-linux-amd64
       - 
         name: Upload Release Asset Linux
         id: upload-release-asset-linux
@@ -56,6 +59,9 @@ jobs:
           asset_path: ./dist/logshark-linux-amd64.tar.gz
           asset_name: logshark-linux-amd64.tar.gz
           asset_content_type: application/gzip
+      
+      - name: gzip win
+        run: tar -cvzf dist/logshark-windows-amd64.exe ./dist/logshark-windows-amd64.tar.gz
 
       - 
         name: Upload Release Asset Windows
