@@ -30,5 +30,5 @@ Releases [here](https://github.com/ugosan/logshark/releases)
 ### docker
 
 ```perl
-docker run -it ugosan/logshark -host 0.0.0.0 -port 9200
+docker run -p 9200:9200 -it ugosan/logshark -host 0.0.0.0 -port 9200
 ```
