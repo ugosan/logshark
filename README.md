@@ -1,8 +1,9 @@
-<kbd>![](./_doc/demo.gif)</kbd>
-
 # logshark
 
 Logshark is a debugger for JSON logs.
+
+
+<kbd>![](./_doc/demo.gif)</kbd>
 
 Logshark works by listening for logs on an HTTP port, it mimicks the Elasticsearch protocol so as to receive data from Beats (Filebeat, Metricbeat, Heartbeat, etc.) and Logstash using the standard elasticsearch output. 
 
