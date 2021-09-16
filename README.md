@@ -32,3 +32,22 @@ Releases [here](https://github.com/ugosan/logshark/releases)
 ```perl
 docker run -p 9200:9200 -it ugosan/logshark -host 0.0.0.0 -port 9200
 ```
+
+You can reach the logshark container from another container using `host.docker.internal` like `docker run --rm byrnedo/alpine-curl -v -XPOST -d '{"hello":"test"}' http://host.docker.internal:9200`
+
+### docker-compose
+
+```
+docker-compose run -p 9200:9200 logshark -port 9200
+```
+
+```yaml
+version: "3.2"
+services:
+
+  #note you should not use "docker-compose up" but instead "docker-compose run logshark sh" since docker-compose doesnt attach to containers with "up". e.g. docker-compose run -p 9200:9200 logshark -port 9200
+  logshark:
+    image: ugosan/logshark
+    tty: true
+    stdin_open: true
+```
