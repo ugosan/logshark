@@ -16,10 +16,18 @@ Features:
 
 ## Download
 
-Beta Release [here](https://github.com/ugosan/logshark/releases/tag/0.1)
+Releases [here](https://github.com/ugosan/logshark/releases)
 
 ## How to use
 
+### binary
+
 ```perl
 ./logshark --host 127.0.0.1 --port 9200 --max 1000
+```
+
+### docker
+
+```perl
+docker run -it ugosan/logshark -host 127.0.0.1 -port 9200
 ```
