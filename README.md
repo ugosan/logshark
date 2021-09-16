@@ -24,11 +24,11 @@ Releases [here](https://github.com/ugosan/logshark/releases)
 ### binary
 
 ```perl
-./logshark --host 127.0.0.1 --port 9200 --max 1000
+./logshark --host 0.0.0.0 --port 9200 --max 1000
 ```
 
 ### docker
 
 ```perl
-docker run -it ugosan/logshark -host 127.0.0.1 -port 9200
+docker run -it ugosan/logshark -host 0.0.0.0 -port 9200
 ```
