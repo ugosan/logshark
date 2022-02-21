@@ -72,7 +72,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		fmt.Fprintf(w, "{\"name\":\"instance-000000001\",\"cluster_name\":\"dummy-cluster\",\"cluster_uuid\":\"yaVi2rdIQT-v-qN9v4II9Q\",\"version\":{\"number\":\"7.10.0\",\"build_flavor\":\"default\",\"build_type\":\"tar\",\"build_hash\":\"0c48c0e\",\"build_date\":\"2019-08-29T19:05:24.312154Z\",\"build_snapshot\":false,\"lucene_version\":\"7.7.0\",\"minimum_wire_compatibility_version\":\"5.6.0\",\"minimum_index_compatibility_version\":\"5.0.0\"},\"tagline\":\"YouKnow,forSearch\"}")
+		fmt.Fprintf(w, "{\"name\":\"instance-0000000000\",\"cluster_name\":\"5b4b73e528774cf9a8fe60b7909adcf0\",\"cluster_uuid\":\"d4XqGxciQxqAFle4qYNWIQ\",\"version\":{\"number\":\"7.13.0\",\"build_flavor\":\"default\"},\"tagline\":\"You Know, for Search\"}")
 	case "POST":
 
 		addEvent(string(body))
@@ -95,7 +95,7 @@ func license(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		fmt.Fprintf(w, "{\"license\":{\"status\":\"active\",\"uid\":\"12a6eab7-f0b0-4375-a2eb-8319b9ecd9c3\",\"type\":\"basic\",\"issue_date\":\"2021-01-02T13:52:43.627Z\",\"issue_date_in_millis\":1609595563627,\"max_nodes\":1000,\"issued_to\":\"docker-cluster\",\"issuer\":\"elasticsearch\",\"start_date_in_millis\":-1}}")
+		fmt.Fprintf(w, "{\"license\":{\"status\":\"active\",\"uid\":\"fb7a9815-8b0a-4608-b786-049fbec4a4a8\",\"type\":\"platinum\",\"issue_date\":\"2020-03-24T00:00:00.000Z\",\"issue_date_in_millis\":1585008000000,\"expiry_date\":\"2222-06-30T00:00:00.000Z\",\"expiry_date_in_millis\":1656547200000,\"max_nodes\":100000,\"issued_to\":\"ElasticCloud\",\"issuer\":\"API\",\"start_date_in_millis\":1614556800000}}")
 	case "POST":
 		addEvent(string(body))
 
@@ -142,7 +142,6 @@ func bulk(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Sends a test POST request
 func SendTestRequest() {
 
 	var testJSON = fmt.Sprintf("{	\"sequence\": %d, \"hola\": \"hola\",\"obj\": {\"a\": 1, \"string\": \"stringsss\", \"array\": [\"one\",\"two\",\"three\"],\"float\": 3.14}, \"name\" : \"instance-000000001\",	\"cluster_name\" : \"<dummy-cluster\",	\"cluster_uuid\" : \"yaVi2rdIQT-v-qN9v4II9Q\",	\"version\" : {		\"number\" : \"6.8.3\",		\"build_flavor\" : \"default\",		\"build_type\" : \"tar\",		\"build_hash\" : \"0c48c0e\",		\"build_date\" : \"2019-08-29T19:05:24.312154Z\",		\"build_snapshot\" : false,		\"lucene_version\" : \"7.7.0\",		\"minimum_wire_compatibility_version\" : \"5.6.0\",		\"minimum_index_compatibility_version\" : \"5.0.0\"	},	\"xml\": \"<car><mirror>XML</mirror></car>\", \"tagline\" : \"You Know, for Search\", \"test\": \" <19> ()weird \\\"aaa\\\": 1 \"}", currentStats.Events)
