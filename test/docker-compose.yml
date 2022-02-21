@@ -1,0 +1,17 @@
+version: "3.2"
+services:
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.0
+    network_mode: host
+    volumes: 
+      - ${PWD}/pipeline.conf:/usr/share/logstash/pipeline/pipeline.conf
+    environment:
+      - LOG_LEVEL=info
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.17.0
+    network_mode: host
+    volumes: 
+      - ${PWD}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ${PWD}/log.log:/tmp/log.log
