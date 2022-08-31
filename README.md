@@ -62,7 +62,7 @@ filter {}
 
 output {
   elasticsearch {
-    hosts => ["http://host.docker.internal:8088"]
+    hosts => ["http://host.docker.internal:9200"]
   }
   
 }   
