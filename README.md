@@ -19,7 +19,7 @@ Features:
 
 Releases [here](https://github.com/ugosan/logshark/releases)
 
-## How to use
+## 1) Start the server
 
 ### binary
 
@@ -50,4 +50,20 @@ services:
     image: ugosan/logshark
     tty: true
     stdin_open: true
+```
+## 2) Point your Logstash pipeline's output to it
+
+Just like a normal `elasticsearch` output:
+
+```ruby
+input {}
+
+filter {}
+
+output {
+  elasticsearch {
+    hosts => ["http://host.docker.internal:8088"]
+  }
+  
+}   
 ```
