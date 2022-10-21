@@ -49,14 +49,11 @@ func addEvent(jsonBody string) {
 func updateEps() {
 	ticker := time.NewTicker(time.Second).C
 
-	for {
-		select {
-		case <-ticker:
+	for range ticker {
 			currentStats.Eps = currentStats.Events - currentStats.EpsT0
 			currentStats.EpsT0 = currentStats.Events
 			currentStats.MaxEvents = configflags.MaxEvents
 			statsChannel <- currentStats
-		}
 	}
 }
 
