@@ -3,7 +3,7 @@ package server
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -62,7 +62,7 @@ func updateEps() {
 
 func home(w http.ResponseWriter, r *http.Request) {
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
@@ -85,7 +85,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 func license(w http.ResponseWriter, r *http.Request) {
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		log.Printf("Error reading body: %v", err)
@@ -107,7 +107,7 @@ func license(w http.ResponseWriter, r *http.Request) {
 
 func bulk(w http.ResponseWriter, r *http.Request) {
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	if err != nil {
 		log.Printf("Error reading body: %v", err)

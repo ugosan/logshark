@@ -4,12 +4,7 @@ import (
 	"image"
 
 	. "github.com/gizak/termui/v3"
-	"github.com/ugosan/logshark/v1/logging"
 	parser "github.com/ugosan/logshark/v1/parser"
-)
-
-var (
-	logs = logging.GetManager()
 )
 
 type Footer struct {

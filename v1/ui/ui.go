@@ -9,8 +9,8 @@ import (
 
 	"github.com/TylerBrock/colorjson"
 	ui "github.com/gizak/termui/v3"
-	tb "github.com/nsf/termbox-go"
 	"github.com/gizak/termui/v3/widgets"
+	tb "github.com/nsf/termbox-go"
 	"github.com/ugosan/logshark/v1/config"
 	"github.com/ugosan/logshark/v1/logging"
 	"github.com/ugosan/logshark/v1/server"
@@ -37,7 +37,7 @@ var (
 	stringsRegex, _ = regexp.Compile(`(\[32m)(.*?)(\[0m)`)
 	numbersRegex, _ = regexp.Compile(`(\[36m)(.*?)(\[0m)`)
 	booleanRegex, _ = regexp.Compile(`(\[33m)(.*?)(\[0m)`)
-	nullRegex, _ 		= regexp.Compile(`(\[35m)(.*?)(\[0m)`)
+	nullRegex, _    = regexp.Compile(`(\[35m)(.*?)(\[0m)`)
 	termWidth       = 0
 	termHeight      = 0
 	formatter       = colorjson.NewFormatter()
@@ -58,7 +58,7 @@ func readEvents() {
 		json.Unmarshal([]byte(jsonBody), &obj)
 
 		prettyJSON, _ := formatter.Marshal(obj)
-		
+
 		var coloredJSON = translateANSI(string(prettyJSON))
 		var escapedJSON = escapeHTML(coloredJSON)
 
@@ -75,9 +75,9 @@ func readEvents() {
 
 }
 
-//instead of redrawing at every event, redraws every N microseconds
+// instead of redrawing at every event, redraws every N microseconds
 func redraw() {
-	if redrawFlag == true {
+	if redrawFlag {
 
 		ui.Render(eventView, eventList, footer, stats, version, serverStatus)
 		redrawFlag = false
@@ -113,7 +113,7 @@ func translateANSI(s string) string {
 	return s
 }
 
-//replacing < by ᐸ since the json encoder escapes HTML/XML characters
+// replacing < by ᐸ since the json encoder escapes HTML/XML characters
 func escapeHTML(s string) string {
 
 	s = strings.Replace(s, "\\u003c", "ᐸ", -1)
@@ -259,6 +259,10 @@ func Start(_config config.Config) {
 		select {
 		case e := <-uiEvents:
 			switch e.ID {
+			case "1":
+				return
+			case "2":
+				return
 			case "q", "<C-c>":
 				return
 			case "<Down>":

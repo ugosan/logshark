@@ -4,7 +4,7 @@ import (
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	log "github.com/sirupsen/logrus"
 	"github.com/ugosan/logshark/v1/config"
-	"io/ioutil"
+	"io"
 	"os"
 	"sync"
 )
@@ -22,7 +22,7 @@ func GetManager() *logmanager {
 
 	once.Do(func() {
 		singleton = &logmanager{logger: log.New()}
-		singleton.logger.SetOutput(ioutil.Discard)
+		singleton.logger.SetOutput(io.Discard)
 	})
 
 	return singleton
