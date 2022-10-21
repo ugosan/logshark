@@ -24,11 +24,9 @@ type Stats struct {
 
 var (
 	configflags config.Config
-
 	currentStats = Stats{0, 0, 0, 0, 0, 0}
 	eventChannel = make(chan string)
 	statsChannel = make(chan Stats)
-	logs         = logging.GetManager()
 )
 
 func addEvent(jsonBody string) {
@@ -43,7 +41,6 @@ func addEvent(jsonBody string) {
 	currentStats.TotalBytes += cap([]byte(jsonBody))
 	currentStats.AvgBytes = currentStats.TotalBytes / currentStats.Events
 	statsChannel <- currentStats
-
 }
 
 func updateEps() {
@@ -91,13 +88,13 @@ func license(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
-	case "GET":
-		fmt.Fprintf(w, "{\"license\":{\"status\":\"active\",\"uid\":\"fb7a9815-8b0a-4608-b786-049fbec4a4a8\",\"type\":\"platinum\",\"issue_date\":\"2020-03-24T00:00:00.000Z\",\"issue_date_in_millis\":1585008000000,\"expiry_date\":\"2222-06-30T00:00:00.000Z\",\"expiry_date_in_millis\":1656547200000,\"max_nodes\":100000,\"issued_to\":\"ElasticCloud\",\"issuer\":\"API\",\"start_date_in_millis\":1614556800000}}")
-	case "POST":
-		addEvent(string(body))
+		case "GET":
+			fmt.Fprintf(w, "{\"license\":{\"status\":\"active\",\"uid\":\"fb7a9815-8b0a-4608-b786-049fbec4a4a8\",\"type\":\"platinum\",\"issue_date\":\"2020-03-24T00:00:00.000Z\",\"issue_date_in_millis\":1585008000000,\"expiry_date\":\"2222-06-30T00:00:00.000Z\",\"expiry_date_in_millis\":1656547200000,\"max_nodes\":100000,\"issued_to\":\"ElasticCloud\",\"issuer\":\"API\",\"start_date_in_millis\":1614556800000}}")
+		case "POST":
+			addEvent(string(body))
 
-	default:
-		fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
+		default:
+			fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
 	}
 
 }
