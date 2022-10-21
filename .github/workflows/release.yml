@@ -15,7 +15,7 @@ jobs:
       - name: Generate build files
         uses: thatisuday/go-cross-build@v1
         with:
-            platforms: 'linux/amd64, darwin/amd64, windows/amd64'
+            platforms: 'linux/amd64, darwin/amd64, darwin/arm64, windows/amd64'
             package: 'cmd'
             name: 'logshark'
             compress: 'false'
@@ -46,10 +46,24 @@ jobs:
           asset_name: logshark-darwin-amd64.tar.gz
           asset_content_type: application/gzip
       
+      - name: gzip mac m1
+        run: tar -cvzf logshark-darwin-arm64.tar.gz ./dist/logshark-darwin-arm64
+
+      - name: Upload Release Asset Mac
+        id: upload-release-asset-mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: logshark-darwin-arm64.tar.gz
+          asset_name: logshark-darwin-arm64.tar.gz
+          asset_content_type: application/gzip
+
       - name: gzip linux
         run: tar -cvzf logshark-linux-amd64.tar.gz ./dist/logshark-linux-amd64
-      - 
-        name: Upload Release Asset Linux
+      
+      - name: Upload Release Asset Linux
         id: upload-release-asset-linux
         uses: actions/upload-release-asset@v1
         env:
@@ -63,8 +77,7 @@ jobs:
       - name: gzip win
         run: tar -cvzf logshark-windows-amd64.tar.gz ./dist/logshark-windows-amd64.exe
 
-      - 
-        name: Upload Release Asset Windows
+      - name: Upload Release Asset Windows
         id: upload-release-asset-win
         uses: actions/upload-release-asset@v1
         env:
