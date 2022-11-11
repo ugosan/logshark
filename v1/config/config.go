@@ -6,4 +6,5 @@ type Config struct {
 	MaxEvents int
 	LogFile   string
 	Layout    string
+	Theme    string
 }

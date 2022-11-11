@@ -89,7 +89,7 @@ func readStats() {
 	for {
 		_stats := <-statsChannel
 		eventList.Title = fmt.Sprintf("%d/%d", _stats.Events, _stats.MaxEvents)
-		stats.Text = fmt.Sprintf(" <%d>(fg:secondary) eps <%db>(fg:secondary) avg", _stats.Eps, _stats.AvgBytes)
+		stats.Text = fmt.Sprintf(" %d eps %db avg", _stats.Eps, _stats.AvgBytes)
 		redrawFlag = true
 	}
 
@@ -206,7 +206,7 @@ func Start(_config config.Config) {
 
 	formatter.Indent = 2
 
-	t.GetManager().SetTheme("lavanda")
+	t.GetManager().SetTheme(configflags.Theme)
 	eventView.Title = "JSON"
 	eventView.WrapText = true
 

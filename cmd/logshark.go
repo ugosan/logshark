@@ -25,6 +25,7 @@ func main() {
 	flag.IntVar(&config.MaxEvents, "max", 100, "Specify max events. Default is 100")
 	flag.StringVar(&config.Layout, "layout", "horizontal", "Sets the layout to horizontal style (default) or vertical (like wireshark)")
 	flag.StringVar(&config.LogFile, "log", "/dev/null", "Specify a log file (debug). Default is /dev/null")
+	flag.StringVar(&config.Theme, "theme", "lavanda", "Specify a theme. Options are lavanda (default), marrombombom, mono and santa.")
 
 	flag.Parse()
 
