@@ -49,8 +49,8 @@ jobs:
       - name: gzip mac m1
         run: tar -cvzf logshark-darwin-arm64.tar.gz ./dist/logshark-darwin-arm64
 
-      - name: Upload Release Asset Mac
-        id: upload-release-asset-mac
+      - name: Upload Release Asset Mac M1
+        id: upload-release-asset-m1
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
