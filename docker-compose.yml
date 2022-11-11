@@ -3,7 +3,7 @@ services:
   
   #note you should not use "docker-compose up" but instead "docker-compose run logshark sh" since docker-compose doesnt attach to containers with "up". e.g. docker-compose run -p 9200:9200 logshark -port 9200
   logshark:
-    image: ugosan/logshark
+    image: ugosan/logshark:latest
     tty: true
     stdin_open: true
     
