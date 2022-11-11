@@ -6,7 +6,7 @@ on:
     - 'v*'
 
 jobs:
-  release_logshark:
+  logshark_doo_doo_doo_doo:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,7 +15,7 @@ jobs:
       - name: Generate build files
         uses: thatisuday/go-cross-build@v1
         with:
-            platforms: 'linux/amd64, darwin/amd64, darwin/arm64, windows/amd64'
+            platforms: 'linux/amd64, darwin/amd64, windows/amd64'
             package: 'cmd'
             name: 'logshark'
             compress: 'false'
@@ -45,21 +45,7 @@ jobs:
           asset_path: logshark-darwin-amd64.tar.gz
           asset_name: logshark-darwin-amd64.tar.gz
           asset_content_type: application/gzip
-      
-      - name: gzip mac m1
-        run: tar -cvzf logshark-darwin-arm64.tar.gz ./dist/logshark-darwin-arm64
-
-      - name: Upload Release Asset Mac M1
-        id: upload-release-asset-m1
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: logshark-darwin-arm64.tar.gz
-          asset_name: logshark-darwin-arm64.tar.gz
-          asset_content_type: application/gzip
-
+     
       - name: gzip linux
         run: tar -cvzf logshark-linux-amd64.tar.gz ./dist/logshark-linux-amd64
       
