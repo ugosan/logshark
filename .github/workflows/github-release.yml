@@ -1,0 +1,23 @@
+name: binary-release
+
+on:
+  push:
+    tags:
+    - 'v*'
+
+jobs:
+  logshark_doo_doo_doo_doo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.19.0' 
+    
+      - name: Run build MAC arm64
+        run: GOOS=darwin GOARCH=arm64 go build -buildmode exe -ldflags="-w -s" -o logshark ./cmd
+
+      
