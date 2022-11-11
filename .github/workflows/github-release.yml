@@ -42,6 +42,7 @@ jobs:
         run: tar -cvzf logshark-windows-amd64.tar.gz -C ./dist/windows-amd64 .
 
       - name: Create Release
+        id: create_release
         uses: ncipollo/release-action@v1.11.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
