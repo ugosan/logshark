@@ -17,7 +17,77 @@ jobs:
         with:
           go-version: '1.19.0' 
     
-      - name: Run build MAC arm64
-        run: GOOS=darwin GOARCH=arm64 go build -buildmode exe -ldflags="-w -s" -o logshark ./cmd
+      - name: Run build MAC amd64
+        run: GOOS=darwin GOARCH=amd64 go build -buildmode exe -ldflags="-w -s" -o ./dist/darwin-amd64/logshark ./cmd
 
-      
+      - name: gzip mac amd64
+        run: tar -cvzf logshark-darwin-amd64.tar.gz -C ./dist/darwin-amd64 .
+
+      - name: Run build MAC M1
+        run: GOOS=darwin GOARCH=arm64 go build -buildmode exe -ldflags="-w -s" -o ./dist/darwin-m1/logshark ./cmd
+
+      - name: gzip mac M1
+        run: tar -cvzf logshark-darwin-M1.tar.gz -C ./dist/darwin-m1 .
+
+      - name: Run build Linux amd64
+        run: GOOS=linux GOARCH=amd64 go build -buildmode exe -ldflags="-w -s" -o ./dist/linux-amd64/logshark ./cmd
+
+      - name: gzip Linux amd64
+        run: tar -cvzf logshark-linux-amd64.tar.gz -C ./dist/linux-amd64 .
+
+      - name: Run build Windows amd64
+        run: GOOS=windows GOARCH=amd64 go build -buildmode exe -ldflags="-w -s" -o ./dist/windows-amd64/logshark.exe ./cmd
+
+      - name: gzip Windows amd64
+        run: tar -cvzf logshark-windows-amd64.tar.gz -C ./dist/windows-amd64 .
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Logshark ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset Mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: logshark-darwin-amd64-${{ github.ref }}.tar.gz
+          asset_name: logshark-darwin-amd64-${{ github.ref }}.tar.gz
+          asset_content_type: application/gzip
+
+
+      - name: Upload Release Asset Mac M1
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: logshark-darwin-arm64-${{ github.ref }}.tar.gz
+          asset_name: logshark-darwin-arm64-${{ github.ref }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload Release Asset Linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: logshark-linux-amd64-${{ github.ref }}.tar.gz
+          asset_name: logshark-linux-amd64-${{ github.ref }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload Release Asset Windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} 
+          asset_path: logshark-windows-amd64-${{ github.ref }}.tar.gz
+          asset_name: logshark-windows-amd64-${{ github.ref }}.tar.gz
+          asset_content_type: application/gzip
