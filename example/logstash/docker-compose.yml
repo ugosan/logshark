@@ -1,0 +1,19 @@
+version: "3.2"
+services:
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.5.1
+    volumes:
+      - ${PWD}/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ${PWD}/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ${PWD}/pipelines:/tmp/logstash/pipelines
+      - ${PWD}/data:/tmp/logstash/data
+
+    environment:
+        LS_JAVA_OPTS: "-Xms1024m -Xmx1024m"
+  
+  #note you should not use "docker-compose up" but instead "docker-compose run logshark sh" since docker-compose doesnt attach to containers with "up". e.g. docker-compose run -p 9200:9200 logshark -port 9200
+  logshark:
+    image: ugosan/logshark:latest
+    tty: true
+    stdin_open: true
+    

@@ -1,0 +1,3 @@
+log.level: info
+config.reload.automatic: true
+config.reload.interval: 4s

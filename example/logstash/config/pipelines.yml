@@ -1,0 +1,3 @@
+- pipeline.id: pipeline1
+  path.config: "/tmp/logstash/pipelines/pipeline1.conf"
+  pipeline.batch.size: 1
